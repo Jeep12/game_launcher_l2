@@ -1,0 +1,66 @@
+{
+  "name": "Launcher-L2-Terra",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "set NODE_ENV=development && electron .",
+    "build": "webpack --config webpack.config.js",
+    "dist": "cross-env NODE_ENV=production electron-builder",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Aplicación PWA en Electron",
+  "devDependencies": {
+    "@babel/core": "^7.26.10",
+    "@babel/preset-env": "^7.26.9",
+    "babel-loader": "^10.0.0",
+    "copy-webpack-plugin": "^13.0.0",
+    "cross-env": "^7.0.3",
+    "electron": "^28.3.3",
+    "electron-builder": "^26.0.12",
+    "webpack": "^5.98.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-node-externals": "^3.0.0"
+  },
+  "dependencies": {
+    "bootstrap": "^5.3.2",
+    "jquery": "^3.7.1",
+    "popper.js": "^1.16.1"
+  },
+  "build": {
+    "appId": "L2Terra",
+    "productName": "PWA_JS",
+    "files": [
+      "index.html",
+      "main.js",
+      "dist/**/*",
+      "node_modules/**/*",
+      "src/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "icon": "static/assets/images/queen_icon_256px.ico",
+      "target": [
+        "nsis"
+      ]
+    },
+    "mac": {
+      "icon": "static/assets/images/queen_icon_256px.ico",
+      "category": "public.app-category.utilities",
+      "target": [
+        "dmg"
+      ]
+    },
+    "linux": {
+      "icon": "static/assets/images/queen_icon_256px.ico",
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    }
+  }
+}
