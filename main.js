@@ -1,5 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const path = require('path');
+const fs = require('fs');
+const { spawn, exec } = require('child_process');
 
 // 🧠 Hot reload para desarrollo
 try {
@@ -10,7 +12,6 @@ let mainWindow;
 let splash;
 
 function createWindow() {
-  // Splash Screen
   splash = new BrowserWindow({
     width: 400,
     height: 300,
@@ -22,7 +23,6 @@ function createWindow() {
 
   splash.loadFile(path.join(__dirname, 'splash.html'));
 
-  // Ventana principal
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -58,11 +58,41 @@ function createWindow() {
     event.reply('selected-folder', result.canceled ? null : result.filePaths[0]);
   });
 
- // Menu.setApplicationMenu(null); // Oculta el menú
- mainWindow.webContents.openDevTools(); // DevTools
+  ipcMain.on('launch-game', (event, folderPath) => {
+    const exePath = path.join(folderPath, 'system', 'L2.exe');
+    console.log('Intentando ejecutar:', exePath);
+
+    if (!fs.existsSync(exePath)) {
+      dialog.showErrorBox('Error', 'No se encontró L2.exe en la carpeta seleccionada. Seleccione la carpeta raíz del cliente.');
+      return;
+    }
+
+    const gameProcess = spawn(`"${exePath}"`, {
+      shell: true,
+      detached: true,
+      stdio: 'ignore',
+    });
+
+    gameProcess.unref();
+    console.log(`L2.exe lanzado con PID (no trackeado): ${gameProcess.pid}`);
+  });
+
+  mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(createWindow);
+
+// 💀 Matamos todos los L2.exe al cerrar
+app.on('before-quit', () => {
+  console.log('Cerrando todos los procesos L2.exe...');
+  exec('taskkill /IM L2.exe /F', (error, stdout, stderr) => {
+    if (error) {
+      console.error('Error al cerrar L2.exe:', error.message);
+    } else {
+      console.log('Procesos L2.exe cerrados correctamente.');
+    }
+  });
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
