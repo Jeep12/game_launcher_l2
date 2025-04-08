@@ -11,6 +11,33 @@ try {
 let mainWindow;
 let splash;
 
+// 🧱 Ventana de error personalizada
+function showErrorWindow(msg = 'Ocurrió un error.') {
+  const errorWin = new BrowserWindow({
+    width: 500,
+    height: 250,
+    resizable: false,
+    modal: true,
+    parent: mainWindow,
+    frame: false, 
+    backgroundColor: '#252525',
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+  errorWin.setMenu(null);
+
+
+  errorWin.loadFile(path.join(__dirname, 'src/static/views/error.html'));
+
+  errorWin.webContents.once('did-finish-load', () => {
+    errorWin.webContents.executeJavaScript(`
+      document.getElementById('error-msg').innerText = \`${msg}\`;
+    `);
+  });
+}
+
 function createWindow() {
   splash = new BrowserWindow({
     width: 400,
@@ -63,7 +90,8 @@ function createWindow() {
     console.log('Intentando ejecutar:', exePath);
 
     if (!fs.existsSync(exePath)) {
-      dialog.showErrorBox('Error', 'No se encontró L2.exe en la carpeta seleccionada. Seleccione la carpeta raíz del cliente.');
+      // Usamos nuestra ventana personalizada
+      showErrorWindow('No se encontró L2.exe en la carpeta seleccionada. Seleccione la carpeta raíz del cliente.');
       return;
     }
 

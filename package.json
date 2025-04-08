@@ -8,7 +8,6 @@
     "dist": "cross-env NODE_ENV=production electron-builder",
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "webpack --watch --config webpack.config.js"
-
   },
   "keywords": [],
   "author": "",
@@ -54,7 +53,8 @@
       "icon": "static/assets/images/queen_icon_256px.ico",
       "target": [
         "nsis"
-      ]
+      ],
+      "requestedExecutionLevel": "requireAdministrator"
     },
     "mac": {
       "icon": "static/assets/images/queen_icon_256px.ico",
