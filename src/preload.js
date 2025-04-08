@@ -2,6 +2,6 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 // Exponer funciones específicas al renderer
 contextBridge.exposeInMainWorld('electron', {
-  sendMessage: (message) => ipcRenderer.send('message', message),
-  onMessage: (callback) => ipcRenderer.on('message', callback)
+  openFolderDialog: () => ipcRenderer.send('open-folder-dialog'),  // Solicitar la apertura del diálogo de selección de carpeta
+  onFolderSelected: (callback) => ipcRenderer.on('selected-folder', (_, folderPath) => callback(folderPath)),
 });

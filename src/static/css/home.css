@@ -1,0 +1,78 @@
+.parent {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 8px;
+    width: 95% !important;
+
+    margin: auto;
+}
+
+.div1 {
+    grid-column: span 2 / span 2;
+    grid-row: span 4 / span 4;
+    background-color: #252525;
+
+}
+
+.div2 {
+    grid-column: span 3 / span 3;
+    grid-row: span 4 / span 4;
+    grid-column-start: 3;
+    background-color: #252525;
+    display: flex;
+    color: goldenrod;
+
+}
+
+.div3 {
+    grid-column: span 5 / span 5;
+    grid-row-start: 5;
+    min-height: 100%;
+    background-color: #252525;
+    padding: 5px;
+
+    
+}
+
+#btnSelectFolder {
+    background-color: goldenrod;
+    border: none;
+    padding: 5px 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: white;
+}
+
+.folderInfo {
+    color: goldenrod;
+    display: flex;
+}
+.folderPath {
+    text-decoration: underline;
+}
+#fileUpload {
+    height: 20px;
+    border-radius: 5px;
+    width: 100%;
+
+}
+.progress-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+  progress::-webkit-progress-value {
+    background-color: goldenrod; /* Color de la barra de progreso */
+  }
+  
+  progress::-webkit-progress-bar {
+    background-color: #383838;
+  }
+  
+  /* Para Firefox */
+  progress::-moz-progress-bar {
+    background-color: goldenrod; /* Color de la barra de progreso */
+  }
+  

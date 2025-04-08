@@ -1,0 +1,52 @@
+@import url('home.css');
+@import url('login.css');
+:root {
+    /* Colores base */
+    --dark-gray: #212121;
+    --bg-dark-alt: #252525;
+    --gray-dark-alt: #3d3d3d;
+
+    --goldenrod: #DAA520;
+    --gold: gold;
+    --white: #ffffff;
+
+    /* Colores de la UI */
+    --main-bg: var(--dark-gray);
+
+    /*Formularios*/
+    --form-bg: var(--bg-dark-alt);
+    --form-text: var(--goldenrod);
+    --form-border: var(--goldenrod);
+    --form-border-focus: var(--gold);
+    --form-btn-bg: var(--goldenrod);
+    --form-btn-bg-hover: var(--gold);
+    --form-btn-text: var(--white);
+
+    /*Navbar*/
+    --navbar-bg-button:var(--bg-dark-alt);
+    --navbar-bg-button-hover: var(--gray-dark-alt);
+
+    --navbar-text:var(--goldenrod);
+    --navbar-text-hover: var(--gold);
+}
+html,body {
+    background-color: var(--main-bg) !important;
+    overflow-y: hidden;
+}
+
+.navbar ul li {
+    list-style: none;
+    display: inline-block;
+}
+.navbar ul li button {
+    background-color: var(--navbar-bg-button);
+    color:var(--navbar-text);
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+.navbar ul li button:hover {
+    background-color: var(--navbar-bg-button-hover);
+    color: var(--navbar-text-hover);
+}
+

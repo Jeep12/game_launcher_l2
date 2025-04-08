@@ -16,7 +16,7 @@ module.exports = {
 
   // Configuración para que no incluya node_modules en el bundle
   externals: {
-    electron: 'require("electron")' // Evita empaquetar electron en el bundle
+    electron: 'commonjs electron'  // Cambio aquí, ahora se usa 'commonjs electron'
   },
 
   // Configuración de los loaders para manejar los archivos
@@ -26,7 +26,7 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader', // Usamos Babel para transpilar JS moderno a JS compatible
+          loader: 'babel-loader', // Usamos Babel para transpilar JS moderno
           options: {
             presets: ['@babel/preset-env']
           }
