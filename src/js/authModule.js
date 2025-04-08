@@ -21,9 +21,15 @@ export async function register(email, password) {
           // Si la respuesta no es exitosa, arroja un error con el mensaje de la API
           if (!response.ok) {
             const errorData = await response.json();
+            if(errorData.message == "Failed to fetch"){
+                return {
+                    status: 500,
+                    message: "Error de conexión con el servidor"
+                };
+            }
             return {
                 status: response.status,
-                message: errorData.message
+                message: errorData.message ||  "Error desconocido"
             };
         }
 

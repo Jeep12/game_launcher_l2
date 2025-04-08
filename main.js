@@ -25,7 +25,7 @@ function createWindow() {
   // Ventana principal
   mainWindow = new BrowserWindow({
     width: 1200,
-    height: 900,
+    height: 800,
     resizable: false,
     show: false,
     backgroundColor: '#212121',
@@ -58,8 +58,8 @@ function createWindow() {
     event.reply('selected-folder', result.canceled ? null : result.filePaths[0]);
   });
 
-  //Menu.setApplicationMenu(null); // Oculta el menú
-  mainWindow.webContents.openDevTools(); // DevTools
+ // Menu.setApplicationMenu(null); // Oculta el menú
+ mainWindow.webContents.openDevTools(); // DevTools
 }
 
 app.whenReady().then(createWindow);

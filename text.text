@@ -1,34 +1,117 @@
-import { environment } from '../environments/environment.js';
+    <button id="btnSelectFolder">Seleccionar Carpeta</button>
+    <span class="folderInfo">
+      <p><strong>Carpeta Seleccionada: &nbsp;&nbsp;</strong></p>
+      <p id="folderPath"> </p>
+    </span>
+    <button>Jugar</button>
 
-let apiUrl = environment.apiUrl;
+    <div class="progress-container">
+      <label for="fileUpload">Cargando archivo...</label>
+      <progress id="fileUpload" value="50" max="100"></progress>
+    </div>
 
-export async function register(email, password) {
-  let endpoint = apiUrl + '/auth/register';
 
-  const data = {
-    email: email,
-    password: password,
-  };
 
-  try {
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
 
-    // Si la respuesta no es exitosa, arroja un error con el mensaje de la API
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Error en el registro');
-    }
 
-    // Si la respuesta es exitosa, devuelve la respuesta como un JSON
-    return await response.json();
-  } catch (error) {
-    console.error('Error en la solicitud de registro:', error);
-    throw error;
-  }
+
+
+
+
+
+
+
+    html, body {
+    height: 100%;
+    margin: 0;
 }
+
+/* Contenedor principal .container-home ocupa toda la altura de la pantalla */
+.container-home {
+    display: flex;
+    flex-direction: column; /* Organiza los elementos de arriba hacia abajo */
+    height: 100dvh; /* Esto asegura que el contenedor principal ocupe toda la altura */
+    color: white;
+    border: 1px solid white;
+}
+
+/* .wrapper-info ocupa el 70% de la altura fija */
+.wrapper-info {
+    display: flex;
+    height: 70%; /* Altura fija del 70% */
+    background-color: red;
+}
+
+/* .stats ocupa el 40% del ancho dentro de .wrapper-info */
+.stats {
+    width: 40%;
+    background-color: green;
+}
+
+/* .rankings ocupa el 60% del ancho dentro de .wrapper-info */
+.rankings {
+    width: 60%;
+    background-color: yellow;
+}
+
+/* .control-ranking ocupa el 100% del ancho disponible dentro de .rankings */
+.control-ranking {
+    width: 100%;
+    background-color: red;
+    display: flex;
+    justify-content: center;
+}
+
+/* .config-game ocupa el 30% restante de la altura fija */
+.config-game {
+    background-color: blue;
+    height: 30%; 
+    display: flex;
+    flex-direction: column;
+
+}
+.select-folder {
+    background-color: red;
+    width: 70%;
+}
+.control-game {
+    background-color: yellow;
+    width: 100%;
+    display: flex;
+}
+.play {
+    width: 30%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: green;
+}
+.play button {
+    padding: 20px;
+    width: 200px;
+    height: 70px;
+    border: none;
+    background-color:var(--btn-play);
+    color: white;
+}
+.progress-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: red;
+    width: 100%;
+
+}
+  progress::-webkit-progress-value {
+    background-color: goldenrod; /* Color de la barra de progreso */
+  }
+  
+  progress::-webkit-progress-bar {
+    background-color: #383838;
+  }
+  
+  /* Para Firefox */
+  progress::-moz-progress-bar {
+    background-color: goldenrod; /* Color de la barra de progreso */
+  }
+  

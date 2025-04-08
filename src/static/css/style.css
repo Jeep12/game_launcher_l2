@@ -23,18 +23,31 @@
     --form-btn-bg-hover: var(--gold);
     --form-btn-text: var(--white);
 
+
     /*Navbar*/
     --navbar-bg-button:var(--bg-dark-alt);
     --navbar-bg-button-hover: var(--gray-dark-alt);
 
     --navbar-text:var(--goldenrod);
     --navbar-text-hover: var(--gold);
+
+    /*Home*/
+    --btn-play:var(--goldenrod);
+    --btn-select-folder:var(--goldenrod);
+    --bg-grill:var(--bg-dark-alt);
+
+
+
 }
 html,body {
     background-color: var(--main-bg) !important;
     overflow-y: hidden;
 }
+.navbar{
+    height: 70px;
+    width: 100%;
 
+}
 .navbar ul li {
     list-style: none;
     display: inline-block;
@@ -51,3 +64,23 @@ html,body {
     color: var(--navbar-text-hover);
 }
 
+.dropdown-menu {
+    background-color: var(--bg-dark-alt);
+    color: var(--goldenrod) !important;
+    border: none;
+    width: 100%;
+
+}
+.dropdown-menu li {
+    width: 100%;
+    text-align: center;
+    
+}
+.dropdown-menu li a:hover {
+    background-color: transparent;
+}
+.dropdown-menu li button {
+    color: var(--goldenrod) !important;
+    background-color: red;
+
+}

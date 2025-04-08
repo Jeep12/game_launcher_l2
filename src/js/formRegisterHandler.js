@@ -18,9 +18,7 @@ export function initFormRegisterHandler() {
   spinnerLoader.style.display = 'none';
   console.log(window.location.href);
 
-  email.value = 'encabojuan@gmail.com';
-  password.value = 'Holapton2!';
-  confirmPassword.value = 'Holapton2!';
+
 
   if (togglePassword) {
     togglePassword.addEventListener('click', () => {
@@ -48,33 +46,43 @@ export function initFormRegisterHandler() {
 
       if (emailValue === '' && passwordValue === '' && confirmPasswordValue === '') {
         errorContainer.innerHTML = messageError('Todos los campos son obligatorios.');
+        spinnerLoader.style.display = 'none';
+        registerButton.style.display = 'block';
       }
 
       if (emailValue === '') {
         errorContainer.innerHTML = messageError('El correo no puede estar vacío.');
+        spinnerLoader.style.display = 'none';
+        registerButton.style.display = 'block';
         return;
       }
 
       if (!validateEmail(emailValue)) {
         errorContainer.innerHTML = messageError('El correo no es válido.');
+        spinnerLoader.style.display = 'none';
+        registerButton.style.display = 'block';
         return;
       }
 
       if (!validatePassword(passwordValue)) {
         errorContainer.innerHTML = messageError(
           `La contraseña debe tener al menos:
-          <div class="text-start ms-4">
+          <div class="text-start ms-4 ">
             • 8 caracteres<br>
             • Una mayúscula<br>
             • Un número<br>
             • Un carácter especial.
           </div>`
         );
+        spinnerLoader.style.display = 'none';
+        registerButton.style.display = 'block';
         return;
       }
 
       if (passwordValue !== confirmPasswordValue) {
         errorContainer.innerHTML = messageError('Las contraseñas no coinciden.');
+        spinnerLoader.style.display = 'none';
+        registerButton.style.display = 'block';
         return;
       }
 

@@ -1,27 +1,37 @@
 <!-- index.html -->
 <!DOCTYPE html>
-<html lang="es" >
+<html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:8080;">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:8080;">
   <link rel="stylesheet" href="dist/renderer/styles.css">
   <script src="dist/renderer/renderer.bundle.js" defer></script>
 
 </head>
+
 <body style="background-color: #212121; margin: 0; padding: 0;">
   <nav class="navbar">
     <ul>
-      <li ><img width="60" height="50" src="src\static\assets\images\tlogo.png" alt=""></li>
-      <li><button  id="homeLink"><i class="fa-solid fa-house"></i> Inicio</button></li>
-      <li><button id="informationLink" ><i class="fa-solid fa-circle-info"></i> Informacíon</button></li>
-      <li><button><i class="fa-solid fa-gear"></i> Configuración</button></li>
-      
+      <li><img width="60" height="50" src="src\static\assets\images\tlogo.png" alt=""></li>
+      <li><button id="homeLink"><i class="fa-solid fa-house"></i> Inicio</button></li>
+      <li><button id="informationLink"><i class="fa-solid fa-circle-info"></i> Informacíon</button></li>
+      <li class="dropdown">
+        <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="fa-solid fa-gear"></i> Configuración
+        </button>
+        <ul class="dropdown-menu">
+          <li><button id="changeFolder" class="dropdown-item" href="#">Cambiar carpeta</button></li>
+        </ul>
+      </li>
+
     </ul>
     <ul style="float: right;margin-right: 30px;">
 
       <li><button id="loginLink"><i class="fa-solid fa-user"></i> Ingresar</button></li>
-      <li><button  id="registerLink"><i class="fa-solid fa-user-plus"></i> Registrarse</button></li>
+      <li><button id="registerLink"><i class="fa-solid fa-user-plus"></i> Registrarse</button></li>
     </ul>
   </nav>
 
@@ -31,4 +41,5 @@
 
   </div>
 </body>
+
 </html>
