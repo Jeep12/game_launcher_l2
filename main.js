@@ -1,13 +1,34 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu} = require('electron'); // Asegúrate de incluir ipcMain aquí
+const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
 const path = require('path');
-let mainWindow;
 
-// Función para crear la ventana principal
+// 🧠 Hot reload para desarrollo
+try {
+  require('electron-reloader')(module);
+} catch (_) {}
+
+let mainWindow;
+let splash;
+
 function createWindow() {
+  // Splash Screen
+  splash = new BrowserWindow({
+    width: 400,
+    height: 300,
+    frame: false,
+    alwaysOnTop: true,
+    resizable: false,
+    backgroundColor: '#212121',
+  });
+
+  splash.loadFile(path.join(__dirname, 'splash.html'));
+
+  // Ventana principal
   mainWindow = new BrowserWindow({
     width: 1200,
-    height: 800,
+    height: 900,
     resizable: false,
+    show: false,
+    backgroundColor: '#212121',
     webPreferences: {
       preload: path.join(__dirname, 'src/preload.js'),
       nodeIntegration: false,
@@ -16,15 +37,14 @@ function createWindow() {
     },
   });
 
-  // Eliminar el menú de la aplicación
-  //Menu.setApplicationMenu(null);
-
-  // Cargar el archivo HTML principal
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-  // Abre las DevTools solo si está en desarrollo
-  mainWindow.webContents.openDevTools();
-
+  mainWindow.once('ready-to-show', () => {
+    setTimeout(() => {
+      splash.destroy();
+      mainWindow.show();
+    }, 500);
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -35,25 +55,19 @@ function createWindow() {
       properties: ['openDirectory'],
     });
 
-    if (!result.canceled) {
-      event.reply('selected-folder', result.filePaths[0]);
-    } else {
-      event.reply('selected-folder', null); // Enviar null si se cancela la selección
-    }
+    event.reply('selected-folder', result.canceled ? null : result.filePaths[0]);
   });
 
-
+  //Menu.setApplicationMenu(null); // Oculta el menú
+  mainWindow.webContents.openDevTools(); // DevTools
 }
 
-// Evento cuando la aplicación está lista
 app.whenReady().then(createWindow);
 
-// Evento cuando todas las ventanas están cerradas
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-// Evento cuando la aplicación se activa en macOS
 app.on('activate', () => {
   if (mainWindow === null) createWindow();
 });

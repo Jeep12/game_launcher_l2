@@ -1,58 +1,54 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-  // Modo de desarrollo o producción
-  mode: 'development', // Cambia a 'production' cuando estés listo para optimizar
+  mode: 'development', // Cambiar a 'production' cuando esté listo
 
-  // Punto de entrada de la aplicación
   entry: './src/js/renderer.js',
 
-  // Salida del archivo procesado
   output: {
-    path: path.resolve(__dirname, 'dist/renderer'), // Carpeta donde se colocará el archivo final
+    path: path.resolve(__dirname, 'dist/renderer'),
     filename: 'renderer.bundle.js'
   },
 
-  // Configuración para que no incluya node_modules en el bundle
   externals: {
-    electron: 'commonjs electron'  // Cambio aquí, ahora se usa 'commonjs electron'
+    electron: 'commonjs electron'
   },
 
-  // Configuración de los loaders para manejar los archivos
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader', // Usamos Babel para transpilar JS moderno
+          loader: 'babel-loader',
           options: {
             presets: ['@babel/preset-env']
           }
         }
       },
       {
-        test: /\.css$/, // Procesar los archivos .css
-        use: ['style-loader', 'css-loader'] // Usar estos loaders para aplicar el CSS
+        test: /\.css$/,
+        use: [MiniCssExtractPlugin.loader, 'css-loader']
       }
     ]
   },
 
-  // Configuración del plugin CopyWebpackPlugin
   plugins: [
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'src/static', to: 'dist/static' } // Copiar la carpeta 'static' a 'dist/static'
+        { from: 'src/static', to: 'dist/static' }
       ]
+    }),
+    new MiniCssExtractPlugin({
+      filename: 'styles.css' // Archivo CSS generado
     })
   ],
 
-  // Opciones de desarrollo
-  devtool: 'source-map', // Para tener mapas de fuentes, útil para el debugging
+  devtool: 'source-map',
 
-  // Configuración de resolución de archivos
   resolve: {
-    extensions: ['.js', '.json'] // Archivos que Webpack debe reconocer por defecto
+    extensions: ['.js', '.json']
   }
 };

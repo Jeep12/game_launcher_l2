@@ -1,0 +1,34 @@
+import { environment } from '../environments/environment.js';
+
+let apiUrl = environment.apiUrl;
+
+export async function register(email, password) {
+  let endpoint = apiUrl + '/auth/register';
+
+  const data = {
+    email: email,
+    password: password,
+  };
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    // Si la respuesta no es exitosa, arroja un error con el mensaje de la API
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Error en el registro');
+    }
+
+    // Si la respuesta es exitosa, devuelve la respuesta como un JSON
+    return await response.json();
+  } catch (error) {
+    console.error('Error en la solicitud de registro:', error);
+    throw error;
+  }
+}

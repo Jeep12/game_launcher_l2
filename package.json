@@ -6,7 +6,9 @@
     "start": "set NODE_ENV=development && electron .",
     "build": "webpack --config webpack.config.js",
     "dist": "cross-env NODE_ENV=production electron-builder",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --watch --config webpack.config.js"
+
   },
   "keywords": [],
   "author": "",
@@ -21,6 +23,9 @@
     "css-loader": "^7.1.2",
     "electron": "^28.3.3",
     "electron-builder": "^26.0.12",
+    "electron-reload": "^2.0.0-alpha.1",
+    "electron-reloader": "^1.2.3",
+    "mini-css-extract-plugin": "^2.9.2",
     "style-loader": "^4.0.0",
     "webpack": "^5.98.0",
     "webpack-cli": "^5.1.4",

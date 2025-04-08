@@ -2,16 +2,19 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import '../static/css/style.css'; // <-- IMPORTÁ TUS ESTILOS ACÁ ABAJO
+import '../static/css/style.css'; 
 
-import { loadView } from './viewLoader'; // Importa la función para cargar vistas
-import { initFolderSelector } from './folderSelector'; // Importa el archivo de selección de carpeta
-import { initFormHandler } from './formHandler'; // Importa el archivo de manejo de formularios
+import { loadView } from './viewLoader'; 
+import { initFolderSelector } from './folderSelector'; 
+import { initFormLoginHandler } from './formLoginHandler'; 
+import { initFormRegisterHandler } from './formRegisterHandler'; 
+
 document.addEventListener('DOMContentLoaded', () => {
-  // Cargar la vista "home" por defecto al cargar la página
 
-  loadView('home').then(() => {
-    initFolderSelector();
+
+  loadView('register').then(() => {
+  //  initFolderSelector();
+    initFormRegisterHandler();
   });
 
   // Obtener los enlaces por ID y agregar eventos de clic
@@ -22,19 +25,21 @@ document.addEventListener('DOMContentLoaded', () => {
   // Agregar el evento de clic para el enlace "Home"
   homeLink?.addEventListener('click', () => {
     loadView('home').then(() => {
-      initFolderSelector(); // Inicializa el selector de carpetas después de cargar la vista "home"
+      initFolderSelector(); 
     });
   });
   
   // Agregar el evento de clic para el enlace "Login"
   loginLink?.addEventListener('click', () => {
     loadView('login').then(() => {
-      initFormHandler();    // Asegúrate de llamar a initFormHandler cuando cargues la vista de login
+      initFormLoginHandler();   
     });
   });
 
   registerLink?.addEventListener('click', () => {
-    loadView('register');
+    loadView('register').then(() => {
+      initFormRegisterHandler(); 
+    });
   });
   informationLink?.addEventListener('click', () => {
     loadView('information');
@@ -43,3 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 });
+if (module.hot) {
+  module.hot.accept();
+}

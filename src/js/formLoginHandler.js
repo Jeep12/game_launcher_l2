@@ -1,7 +1,8 @@
-export function initFormHandler() {
-    const email = document.getElementById('email');
-    const password = document.getElementById('password');
+export function initFormLoginHandler() {
+    const email = document.getElementById('email-login');
+    const password = document.getElementById('password-login');
     const loginButton = document.getElementById('loginButton'); // Asegúrate de agregar un id al botón
+   
     if (loginButton) {
         loginButton.addEventListener('click', (event) => {
             event.preventDefault(); // Evita que se recargue la página
@@ -9,7 +10,7 @@ export function initFormHandler() {
             // Obtener los valores de los campos
             const emailValue = email.value;
             const passwordValue = password.value;
-
+            
             console.log('Email:', emailValue);
             console.log('Contraseña:', passwordValue);
 
