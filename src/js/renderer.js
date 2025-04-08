@@ -5,7 +5,7 @@ import '../static/css/style.css';
 
 import { loadView } from './viewLoader'; 
 import { initFolderSelector } from './folderSelector'; 
-import { changeFolderSelector } from './changeFolderSelector';
+import { changeFolderPath } from './changeFolderSelector';
 
 import { initFormLoginHandler } from './formLoginHandler'; 
 import { initFormRegisterHandler } from './formRegisterHandler'; 
@@ -54,7 +54,7 @@ function setupHomeView() {
   // Botón del dropdown para cambiar carpeta
   const btnChangeFolder = document.getElementById('changeFolder');
   btnChangeFolder?.addEventListener('click', () => {
-    
+    changeFolderPath();
   });
 }
 
