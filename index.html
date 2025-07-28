@@ -6,39 +6,240 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:8080;">
-  <link rel="stylesheet" href="dist/renderer/styles.css">
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:8080 https://patch.l2terra.online;">
   <script src="dist/renderer/renderer.bundle.js" defer></script>
-
+  <title>L2 Terra Launcher</title>
+  <link rel="stylesheet" href="dist/styles.css">
 </head>
 
-<body style="background-color: #212121; margin: 0; padding: 0;">
-  <nav class="navbar">
-    <ul>
-      <li><img width="60" height="50" src="src\static\assets\images\tlogo.png" alt=""></li>
-      <li><button id="homeLink"><i class="fa-solid fa-house"></i> Inicio</button></li>
-      <li><button id="informationLink"><i class="fa-solid fa-circle-info"></i> Informacíon</button></li>
-      <li class="dropdown">
-        <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="fa-solid fa-gear"></i> Configuración
-        </button>
-        <ul class="dropdown-menu">
-          <li><button id="changeFolder" class="dropdown-item" href="#">Cambiar carpeta</button></li>
-        </ul>
-      </li>
+<body>
+  <div class="filter"></div>
+  <!-- Custom Title Bar -->
+  <div class="custom-titlebar" style="height: 50px;">
+    <!-- Left: Logo + Terra -->
+    <div class="titlebar-left">
+      <div class="img-logo" style="display: flex; align-items: center; gap: 8px;">
+        <img height="35px" src="dist/static/assets/images/images/Tlogo-terra.webp" alt="L2 Terra Logo">
+        <span class="terra-text l2font" style="color: #dabe64; font-weight: bold; font-size: 18px;">Terra</span>
+      </div>
+    </div>
 
-    </ul>
-    <ul style="float: right;margin-right: 30px;">
+    <!-- Center: Navigation -->
+    <div class="titlebar-center" style="display: flex; gap: 50px; align-items: center;padding: 10px;">
+    
+      <a href="#" class="nav-link" data-url="https://l2terra.online">Website</a>
+      <a href="#" class="nav-link">Community</a>
+      <a href="#" class="nav-link" data-url="https://discord.gg/wXnPMdStvW">Discord</a>
+    </div>
 
-      <li><button id="loginLink"><i class="fa-solid fa-user"></i> Ingresar</button></li>
-      <li><button id="registerLink"><i class="fa-solid fa-user-plus"></i> Registrarse</button></li>
-    </ul>
-  </nav>
+    <!-- Right: Window Controls -->
+    <div class="titlebar-controls" style="display: flex; gap: 5px; align-items: center;">
+      <button class="titlebar-btn minimize" id="minimizeBtn" title="Minimizar"
+        style="width: 30px; height: 30px; border: none; background: transparent; color: white; cursor: pointer;">
+        <span style="font-size: 18px;">−</span>
+      </button>
+      <button class="titlebar-btn close" id="closeBtn" title="Cerrar"
+        style="width: 30px; height: 30px; border: none; background: transparent; color: white; cursor: pointer;">
+        <span style="font-size: 16px;">×</span>
+      </button>
+    </div>
+  </div>
 
-  <!-- Contenedor donde se cargarán las vistas -->
-  <div id="content">
-    <div style="color: gold; text-align: center; margin-top: 100px;">Cargando...</div>
+  <br>
+  <br>
+  <div class="control-panel">
+    <div class="header">
+      <!-- Menu Section (30% width) - RED -->
+      <div class="menu">
+        <h3 class="menu-title">Menu</h3>
+        <div class="menu-buttons">
+          <button id="btnUpdate" class="menu-btn">Update</button>
+          <button id="btnRepair" class="menu-btn">Repair</button>
+          <button id="btnSelectFolder" class="menu-btn">Select Folder</button>
+        </div>
+      </div>
 
+      <!-- Rankings Section (70% width) - YELLOW -->
+      <div class="rankings">
+        <!-- Top PVP (50% width) - GREEN -->
+        <div class="top-pvp">
+          <h3 class="ranking-title">TOP PVP</h3>
+          <div class="ranking-table">
+            <table>
+              <thead>
+                <tr>
+                  <th style="color:white;">#</th>
+                  <th style="color: #dabe64;">Player</th>
+                  <th style="color:white;">PvP</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>DragonSlayer</td>
+                  <td>1,250</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>ShadowKnight</td>
+                  <td>1,180</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>BloodWarrior</td>
+                  <td>1,120</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>IronFist</td>
+                  <td>1,050</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>ThunderLord</td>
+                  <td>980</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>FrostMage</td>
+                  <td>920</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>FireBlade</td>
+                  <td>870</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>StormRider</td>
+                  <td>820</td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>DarkHunter</td>
+                  <td>780</td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>LightBringer</td>
+                  <td>740</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Top PK (50% width) - GREEN -->
+        <div class="top-pk" style="color:white;">
+          <h3 class="ranking-title">TOP PK</h3>
+          <div class="ranking-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th style="color: #dabe64;">Player</th>
+                  <th style="color: white;">PK</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>DeathBringer</td>
+                  <td>890</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>ChaosLord</td>
+                  <td>820</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>VoidWalker</td>
+                  <td>780</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>NightStalker</td>
+                  <td>740</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>DemonSlayer</td>
+                  <td>690</td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td>ShadowReaper</td>
+                  <td>650</td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td>BloodThirst</td>
+                  <td>610</td>
+                </tr>
+                <tr>
+                  <td>8</td>
+                  <td>DarkSoul</td>
+                  <td>570</td>
+                </tr>
+                <tr>
+                  <td>9</td>
+                  <td>VoidMaster</td>
+                  <td>530</td>
+                </tr>
+                <tr>
+                  <td>10</td>
+                  <td>ChaosKnight</td>
+                  <td>490</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panel Section (30% height) - BLUE -->
+         <div class="panel">
+      <!-- Progress Bars Section (70% width) -->
+             <div class="progress-section">
+        <div class="folder-section">
+          <div class="folder-display" id="folderPath">Selected folder: No folder selected</div>
+        </div>
+
+        <!-- Single Progress Bar -->
+        <div class="progress-container">
+          <span class="progress-label">Progress:</span>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+          </div>
+          <span class="progress-percentage" id="progressPercent">0%</span>
+        </div>
+        <div class="progress-status" id="progressStatus">Waiting...</div>
+      </div>
+
+      <!-- Play Button Section (30% width) -->
+             <div class="button-section">
+        <div class="button-group">
+          <button id="btnPlay" class="btn btn-play">PLAY</button>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+  <div class="nk-page-border">
+    <div class="nk-page-border-t"></div>
+    <div class="nk-page-border-r"></div>
+    <div class="nk-page-border-b"></div>
+    <div class="nk-page-border-l"></div>
+  </div>
+  
+  <!-- Toast Notification -->
+  <div id="toast" class="toast">
+    <div class="toast-content">
+      <span class="toast-message"></span>
+    </div>
   </div>
 </body>
 

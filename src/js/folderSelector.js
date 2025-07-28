@@ -1,53 +1,81 @@
 export function initFolderSelector() {
+    console.log('=== Initializing FolderSelector ===');
     const selectFolderButton = document.getElementById('btnSelectFolder');
     const folderPathElement = document.getElementById('folderPath');
 
-    // Verifica si ya hay una ruta guardada en localStorage al cargar la página
-    const savedFolderPath = localStorage.getItem('selectedFolder');
-    if (savedFolderPath) {
-        console.log('Carpeta guardada previamente:', savedFolderPath);
-        folderPathElement.innerText = `${savedFolderPath}`;
-    }
-
-    if (selectFolderButton) {
-        console.log('Botón encontrado, añadiendo evento');
-        selectFolderButton.addEventListener('click', () => {
-            console.log('Botón clickeado, enviando evento...');
-            window.electron.openFolderDialog();
-
-
-
+    if (!selectFolderButton || !folderPathElement) {
+        console.error('DOM elements not found in folderSelector:', {
+            selectFolderButton: !!selectFolderButton,
+            folderPathElement: !!folderPathElement
         });
-    } else {
-        console.error('Botón no encontrado!');
+        return;
     }
 
-    window.electron.onFolderSelected((folderPath) => {
-        if (folderPath) {
-            localStorage.setItem('selectedFolder', folderPath); // Guardar la ruta de la carpeta en localStorage
-            folderPathElement.innerText = `${folderPath}`; // Mostrar la ruta seleccionada
+    console.log('DOM elements found correctly');
 
-            const pathFolder = localStorage.getItem("selectedFolder");
-
-            const selectFolder = document.getElementById("btnSelectFolder");
-            const playBtn = document.getElementById("btn-play");
-            if (pathFolder) {
-                selectFolder.style.display = "none";
-                playBtn.style.display = "block";
-            }
-
-            playBtn?.addEventListener("click", () => {
-                const folder = localStorage.getItem('selectedFolder'); // Ruta guardada
-                if (folder) {
-                    window.electron.launchGame(folder); // Llamamos al main con la ruta
-                } else {
-                    alert('Seleccioná una carpeta primero.');
-                }
-            })
-
-
+    function updateUI() {
+        const savedFolderPath = localStorage.getItem('selectedFolder');
+        console.log('Folder saved in localStorage:', savedFolderPath);
+        if (savedFolderPath) {
+            selectFolderButton.textContent = 'Change Folder';
+            folderPathElement.innerText = `Selected folder: ${savedFolderPath}`;
         } else {
-            console.error('No se pudo obtener la ruta de la carpeta seleccionada.');
+            selectFolderButton.textContent = 'Select Folder';
+            folderPathElement.innerText = 'Selected folder: No folder selected';
         }
-    });
+    }
+
+    updateUI();
+
+    // Función para inicializar cuando window.electron esté disponible
+    function initWhenElectronReady() {
+        if (window.electron) {
+            // Elimina listeners previos
+            const newBtn = selectFolderButton.cloneNode(true);
+            selectFolderButton.parentNode.replaceChild(newBtn, selectFolderButton);
+            newBtn.addEventListener('click', () => {
+                console.log('=== Select Folder button clicked ===');
+                console.log('window.electron exists:', !!window.electron);
+                console.log('window.electron.openFolderDialog exists:', !!window.electron.openFolderDialog);
+                window.electron.openFolderDialog();
+            });
+
+            window.electron.onFolderSelected((folderPath) => {
+                console.log('=== Folder selected ===');
+                console.log('folderPath:', folderPath);
+                if (folderPath) {
+                    localStorage.setItem('selectedFolder', folderPath);
+                    console.log('Folder saved in localStorage');
+                    
+                    // Limpiar estado de la carpeta anterior si existe
+                    const previousFolder = localStorage.getItem('previousSelectedFolder');
+                    if (previousFolder && previousFolder !== folderPath && window.gameLauncher) {
+                        console.log('Clearing state for previous folder:', previousFolder);
+                        window.gameLauncher.patchDownloader.clearStateForFolder(previousFolder);
+                    }
+                    
+                    // Guardar la carpeta actual como anterior para la próxima vez
+                    localStorage.setItem('previousSelectedFolder', folderPath);
+                } else {
+                    localStorage.removeItem('selectedFolder');
+                    console.log('Folder removed from localStorage');
+                }
+                updateUI();
+                
+                // Check client status after selecting folder
+                if (window.gameLauncher) {
+                    console.log('Checking client status...');
+                    window.gameLauncher.checkClientStatus();
+                } else {
+                    console.log('window.gameLauncher not available');
+                }
+            });
+        } else {
+            // Si window.electron no está disponible, reintentar en 100ms
+            setTimeout(initWhenElectronReady, 100);
+        }
+    }
+
+    // Iniciar cuando esté listo
+    initWhenElectronReady();
 }

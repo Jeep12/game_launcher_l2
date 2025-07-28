@@ -1,0 +1,220 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:8080 https://patch.l2terra.online;">
+  <script src="dist/renderer/renderer.bundle.js" defer></script>
+  <title>L2 Terra Launcher</title>
+  <link rel="stylesheet" href="dist/renderer/dist/static/css/style.css">
+</head>
+
+<body>
+  <!-- Custom Title Bar -->
+  <div class="custom-titlebar">
+    <div class="titlebar-title">L2 Terra Launcher</div>
+    <div class="titlebar-controls">
+      <button class="titlebar-btn minimize" id="minimizeBtn" title="Minimizar">
+        <span style="font-size: 18px;">−</span>
+      </button>
+      <button class="titlebar-btn close" id="closeBtn" title="Cerrar">
+        <span style="font-size: 16px;">×</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Top Section - Logo and Title -->
+    <div class="main-content">
+
+      <!-- Rankings Section -->
+      <div class="rankings-section">
+        <!-- Menu Column -->
+        <div class="ranking-card menu-card">
+          <h3 class="ranking-title">⚙️ Menú</h3>
+          <div class="menu-list">
+            <button id="btnUpdate" class="menu-btn">🔄 Actualizar</button>
+            <button id="btnRepair" class="menu-btn">🔧 Reparar</button>
+            <button id="btnSelectFolder" class="menu-btn">📁 Seleccionar Carpeta</button>
+            <button id="btnCancel" class="menu-btn">❌ Cancelar</button>
+          </div>
+        </div>
+
+        <!-- Top PVP -->
+        <div class="ranking-card">
+          <h3 class="ranking-title">🏆 Top PVP</h3>
+          <div class="ranking-table" id="topPvpList">
+            <div class="table-header">
+              <span class="header-pos">#</span>
+              <span class="header-name">Jugador</span>
+              <span class="header-score">PVP</span>
+            </div>
+            <div class="table-body">
+              <div class="table-row">
+                <span class="cell-pos">1</span>
+                <span class="cell-name">DragonSlayer</span>
+                <span class="cell-score">1,250</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">2</span>
+                <span class="cell-name">ShadowKnight</span>
+                <span class="cell-score">1,180</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">3</span>
+                <span class="cell-name">BloodWarrior</span>
+                <span class="cell-score">1,120</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">4</span>
+                <span class="cell-name">DarkMage</span>
+                <span class="cell-score">1,050</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">5</span>
+                <span class="cell-name">IronGuard</span>
+                <span class="cell-score">980</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">6</span>
+                <span class="cell-name">ThunderBolt</span>
+                <span class="cell-score">876</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">7</span>
+                <span class="cell-name">LightPaladin</span>
+                <span class="cell-score">765</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">8</span>
+                <span class="cell-name">FireWizard</span>
+                <span class="cell-score">654</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">9</span>
+                <span class="cell-name">IceArcher</span>
+                <span class="cell-score">543</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">10</span>
+                <span class="cell-name">StormRider</span>
+                <span class="cell-score">432</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top PK -->
+        <div class="ranking-card">
+          <h3 class="ranking-title">💀 Top PK</h3>
+          <div class="ranking-table" id="topPkList">
+            <div class="table-header">
+              <span class="header-pos">#</span>
+              <span class="header-name">Jugador</span>
+              <span class="header-score">PK</span>
+            </div>
+            <div class="table-body">
+              <div class="table-row">
+                <span class="cell-pos">1</span>
+                <span class="cell-name">DeathBringer</span>
+                <span class="cell-score">850</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">2</span>
+                <span class="cell-name">NightHunter</span>
+                <span class="cell-score">780</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">3</span>
+                <span class="cell-name">ChaosLord</span>
+                <span class="cell-score">720</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">4</span>
+                <span class="cell-name">VoidWalker</span>
+                <span class="cell-score">680</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">5</span>
+                <span class="cell-name">SoulReaper</span>
+                <span class="cell-score">620</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">6</span>
+                <span class="cell-name">BloodHunter</span>
+                <span class="cell-score">580</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">7</span>
+                <span class="cell-name">ShadowAssassin</span>
+                <span class="cell-score">540</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">8</span>
+                <span class="cell-name">DarkKnight</span>
+                <span class="cell-score">500</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">9</span>
+                <span class="cell-name">VoidMage</span>
+                <span class="cell-score">460</span>
+              </div>
+              <div class="table-row">
+                <span class="cell-pos">10</span>
+                <span class="cell-name">ChaosWarrior</span>
+                <span class="cell-score">420</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Control Panel -->
+      <div class="control-panel">
+        <!-- Folder Selection -->
+
+
+        <!-- Bottom Section - Progress Bars and Buttons -->
+        <div class="bottom-controls" style="margin-bottom: 50px;">
+          <!-- Progress Bars Section (70%) -->
+          <div class="progress-section">
+            <div class="folder-section">
+              <div class="folder-display" style="font-size: 10px;" id="folderPath">Carpeta seleccionada: No se seleccionó ninguna carpeta</div>
+            </div>
+            <!-- Download Progress -->
+            <div class="progress-container">
+              <span class="progress-label">Descarga:</span>
+              <div class="progress-bar">
+                <div class="progress-fill" id="downloadProgressFill" style="width: 0%;"></div>
+              </div>
+              <span class="progress-percentage" id="downloadProgressPercent">0%</span>
+            </div>
+            <div class="progress-status" id="downloadStatus">Esperando...</div>
+
+            <!-- Installation Progress -->
+            <div class="progress-container">
+              <span class="progress-label">Instalación:</span>
+              <div class="progress-bar">
+                <div class="progress-fill" id="installationProgressFill" style="width: 0%;"></div>
+              </div>
+              <span class="progress-percentage" id="installationProgressPercent">0%</span>
+            </div>
+          </div>
+
+          <!-- Action Buttons Section (30%) -->
+          <div class="button-section">
+            <div class="button-group">
+              <button id="btnPlay" class="btn btn-play" disabled>🎮 JUGAR</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>

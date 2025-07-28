@@ -2,80 +2,51 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import '../static/css/style.css';
+import './externalLinks.js';
 
-import { loadView } from './viewLoader';
 import { initFolderSelector } from './folderSelector';
-import { changeFolderPath } from './changeFolderSelector';
+import { setupDownloadButton, gameLauncher } from './gameLauncher.js';
 
-import { initFormLoginHandler } from './formLoginHandler';
-import { initFormRegisterHandler } from './formRegisterHandler';
+// Funcionalidad para la barra de título personalizada
+function initTitleBarControls() {
+  // Función para inicializar cuando window.electron esté disponible
+  function initWhenElectronReady() {
+    if (window.electron) {
+      // Botón minimizar
+      const minimizeBtn = document.getElementById('minimizeBtn');
+      if (minimizeBtn) {
+        minimizeBtn.addEventListener('click', () => {
+          window.electron.minimizeWindow();
+        });
+      }
+      
+      // Botón cerrar
+      const closeBtn = document.getElementById('closeBtn');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          window.electron.closeWindow();
+        });
+      }
+    } else {
+      // Si window.electron no está disponible, reintentar en 100ms
+      setTimeout(initWhenElectronReady, 100);
+    }
+  }
+
+  // Iniciar cuando esté listo
+  initWhenElectronReady();
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-
-  // Cargamos la vista inicial
-  loadView('home').then(() => {
-    setupHomeView();
-  });
-
-
-  // Enlaces de navegación
-  const homeLink = document.getElementById('homeLink');
-  const loginLink = document.getElementById('loginLink');
-  const registerLink = document.getElementById('registerLink');
-  const informationLink = document.getElementById('informationLink');
-
-  homeLink?.addEventListener('click', () => {
-    loadView('home').then(() => {
-      setupHomeView();
-    });
-  });
-
-  loginLink?.addEventListener('click', () => {
-    loadView('login').then(() => {
-      initFormLoginHandler();
-    });
-  });
-
-  registerLink?.addEventListener('click', () => {
-    loadView('register').then(() => {
-      initFormRegisterHandler();
-    });
-  });
-
-  informationLink?.addEventListener('click', () => {
-    loadView('information');
-  });
-});
-
-function setupHomeView() {
-  // Inicializamos el botón principal
   initFolderSelector();
-  const pathFolder = localStorage.getItem("selectedFolder");
-
-  const selectFolder = document.getElementById("btnSelectFolder");
-  const playBtn = document.getElementById("btn-play");
-  if (pathFolder) {
-    selectFolder.style.display = "none";
-    playBtn.style.display = "block";
-  }
-  playBtn?.addEventListener("click", ()=> {
-    const folderPath = localStorage.getItem('selectedFolder');
-  if (folderPath) {
-    window.electron.launchGame(folderPath);
-  } else {
-    alert('Primero seleccioná la carpeta del cliente.');
-  }
-  })
-  // Botón del dropdown para cambiar carpeta
-  const btnChangeFolder = document.getElementById('changeFolder');
-  btnChangeFolder?.addEventListener('click', () => {
-    changeFolderPath();
-  });
-
-
-
-}
-
-if (module.hot) {
-  module.hot.accept();
-}
+  setupDownloadButton(); // <-- conectamos el botón acá
+  
+  // Inicializar controles de la barra de título
+  initTitleBarControls();
+  
+  // Exponer gameLauncher globalmente para que folderSelector pueda acceder
+  window.gameLauncher = gameLauncher;
+  
+  // Cargar rankings
+  gameLauncher.loadRankings();
+});

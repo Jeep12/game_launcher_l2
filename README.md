@@ -1,78 +1,180 @@
-# Launcher-L2-Terra
+# L2 Terra Launcher
 
-<p><strong>Descripción:</strong><br>
+Un launcher moderno y elegante para Lineage 2 Terra con funcionalidades avanzadas de descarga y actualización automática.
 
-Aplicación PWA (Progressive Web App) desarrollada en Electron. El objetivo de esta aplicación es servir como un lanzador de juegos, en este caso para el servidor L2, para así mantener actualizado al cliente de L2 de los jugadores.</p>
+## 🚀 Características Principales
 
-<h2>Requisitos Previos</h2>
-<p>Antes de comenzar, asegúrate de tener instalados los siguientes programas:</p>
-<ul>
-  <li><strong>Node.js</strong> (versión recomendada: 16 o superior)</li>
-  <li><strong>npm</strong> (generalmente se instala junto con Node.js)</li>
-  <li><strong>Git</strong> (para clonar el repositorio)</li>
-</ul>
+### ✨ Descarga y Extracción Automática
+- **Descarga automática de archivos ZIP**: Descarga archivos de parches desde el servidor
+- **Extracción automática**: Descomprime automáticamente los archivos en la carpeta de destino
+- **Gestión de archivos temporales**: Los ZIPs se mueven a una carpeta `temp_download` durante el proceso
+- **Limpieza automática**: Elimina la carpeta temporal al finalizar el proceso
 
-<h2>Instalación</h2>
+### 📊 Barras de Progreso Separadas
+- **Barra de progreso de descarga**: Muestra el progreso de descarga de cada archivo
+- **Barra de progreso de extracción**: Muestra el progreso de extracción de cada archivo
+- **Progreso total**: Barra principal que muestra el progreso general del proceso
 
-<ol>
-  <li>Clona el repositorio:
-    <pre><code>git clone https://github.com/tu-usuario/Launcher-L2-Terra.git</code></pre>
-  </li>
-  <li>Ingresa al directorio del proyecto:
-    <pre><code>cd Launcher-L2-Terra</code></pre>
-  </li>
-  <li>Instala las dependencias del proyecto:
-    <pre><code>npm install</code></pre>
-  </li>
-</ol>
+### 🔄 Proceso Optimizado
+1. **Verificación**: Compara archivos locales con los del servidor
+2. **Descarga**: Descarga solo los archivos que necesitan actualización
+3. **Extracción**: Extrae cada archivo inmediatamente después de descargarlo
+4. **Gestión**: Mueve los ZIPs a carpeta temporal
+5. **Limpieza**: Elimina archivos temporales al finalizar
 
-<h2>Comandos</h2>
+## 🛠️ Instalación
 
-<h3><code>npm run build</code></h3>
-<p>Este comando usa <strong>Webpack</strong> para compilar los archivos del proyecto en una forma optimizada para producción. Se encarga de generar los archivos estáticos necesarios para el lanzamiento.</p>
-<p><strong>¿Qué hace?</strong> Compila y transpila los archivos de tu proyecto, incluyendo JavaScript, CSS y HTML. Genera los archivos optimizados para el entorno de producción.</p>
+### Requisitos
+- Node.js 16 o superior
+- npm o yarn
+- Windows 10/11 (para la extracción con 7-Zip o PowerShell)
 
-<p>Para ejecutar este comando, solo tienes que usar:</p>
-<pre><code>npm run build</code></pre>
+### Instalación
+```bash
+# Clonar el repositorio
+git clone <repository-url>
+cd game_launcher_l2
 
-<h3><code>npm run dist</code></h3>
-<p>Este comando usa <strong>electron-builder</strong> para crear un paquete distribuible de la aplicación. Este paquete es lo que se utilizará para crear un instalador para Windows, Mac o Linux.</p>
-<p><strong>¿Qué hace?</strong> Este comando empaqueta la aplicación en un archivo instalador para la plataforma correspondiente: <code>.exe</code> (Windows), <code>.dmg</code> (Mac) o un instalador para Linux.</p>
+# Instalar dependencias
+npm install
 
-<p>Para ejecutar este comando, solo tienes que usar:</p>
-<pre><code>npm run dist</code></pre>
+# Ejecutar en modo desarrollo
+npm run dev
 
-<h2>Nota:</h2>
-<p>El proceso de compilación (<code>npm run build</code>) es necesario antes de crear el instalador (<code>npm run dist</code>) para que el paquete se construya correctamente y se empaqueten los archivos estáticos.</p>
+# Construir para producción
+npm run build
+```
 
-<h2>Estructura del Proyecto</h2>
-<p>El proyecto sigue la estructura común de aplicaciones Electron y Webpack. Aquí tienes un vistazo a los archivos más importantes:</p>
-<ul>
-  <li><code>main.js</code>: Es el archivo principal donde se inicializa y configura la ventana de Electron.</li>
-  <li><code>webpack.config.js</code>: Configuración de Webpack, encargada de empaquetar y optimizar los archivos.</li>
-  <li><code>src/</code>: Carpeta con los archivos fuente del proyecto (JavaScript, vistas, etc.).</li>
-  <li><code>dist/</code>: Carpeta donde se almacenan los archivos generados para producción (incluye el instalador).</li>
-  <li><code>index.html</code>: El archivo HTML principal cargado por Electron.</li>
-</ul>
+## 📁 Estructura del Proyecto
 
-<h2>SPA (Single Page Application)</h2>
-<p>La aplicación está diseñada como una <strong>SPA (Single Page Application)</strong>. Para manejar las vistas dinámicamente, se utiliza una función que determina si el entorno es de desarrollo o producción para cargar las vistas correspondientes de manera eficiente.</p>
+```
+game_launcher_l2/
+├── src/
+│   ├── js/
+│   │   ├── patchDownloader.js    # Descargador de parches mejorado
+│   │   ├── gameLauncher.js       # Lógica principal del launcher
+│   │   ├── installer.js          # Instalador de archivos
+│   │   └── folderSelector.js     # Selector de carpetas
+│   ├── static/
+│   │   ├── css/
+│   │   │   └── style.css         # Estilos modernos
+│   │   └── views/
+│   └── preload.js               # APIs de Electron
+├── main.js                      # Proceso principal de Electron
+├── index.html                   # Interfaz principal
+└── package.json
+```
 
-<h2>Empaquetado para Producción</h2>
-<p>Para empaquetar la aplicación para producción, sigue estos pasos:</p>
-<ol>
-  <li>Ejecuta <code>npm run build</code> para generar los archivos optimizados para producción.</li>
-  <li>Ejecuta <code>npm run dist</code> para crear un instalador utilizando <strong>electron-builder</strong>. Esto generará los archivos en la carpeta <code>dist/</code>.</li>
-</ol>
+## 🔧 Configuración
 
-<h2>Próximas Funcionalidades</h2>
-<p>En futuras actualizaciones, la aplicación permitirá la creación de cuentas directamente desde la interfaz del lanzador. Para esto, se utilizará una API desarrollada en Spring Boot, la cual gestionará las peticiones de registro y autenticación de usuarios.</p>
+### Servidor de Parches
+El launcher se conecta a `https://patch.l2terra.online/` para obtener:
+- Lista de archivos disponibles
+- Tokens JWT para autenticación
+- Descarga de archivos ZIP
 
-<p>Además de la creación de cuentas, la API se integrará con un sistema de rankings que permitirá a los jugadores ver su posición en el servidor y comparar su rendimiento con otros usuarios.</p>
+### Configuración de Extracción
+El sistema utiliza:
+1. **7-Zip** (preferido): Si está instalado en `C:\Program Files\7-Zip\7z.exe`
+2. **PowerShell**: Como fallback para extraer archivos ZIP
 
-<p>Estas funcionalidades permitirán una experiencia más interactiva y dinámica para los jugadores, manteniendo siempre actualizado el cliente del juego y proporcionando una plataforma centralizada para gestionar las cuentas y estadísticas.</p>
+## 🎯 Uso
 
-<h2>Descargas y Autenticación</h2>
-<p>Para descargar las actualizaciones del cliente del juego, los jugadores deben estar autenticados a través de la aplicación. El servidor Apache proporcionará las actualizaciones, pero solo aquellos jugadores que hayan iniciado sesión correctamente podrán acceder a las descargas.</p>
+### Interfaz Principal
+1. **Seleccionar Carpeta**: Elige la carpeta donde está instalado L2
+2. **Actualizar**: Descarga e instala automáticamente los parches
+3. **Jugar**: Lanza el juego directamente
+4. **Reparar**: Reinstala archivos corruptos
 
-<p>El proceso de autenticación se realizará mediante un token generado por la API. Este token se validará para garantizar que solo los usuarios registrados y autenticados tengan acceso a las actualizaciones del cliente. Las actualizaciones se servirán a través de un servidor Apache configurado para manejar las solicitudes de descarga de manera segura.</p>
+### Proceso de Actualización
+1. **Verificación**: Compara archivos locales con servidor
+2. **Descarga**: Descarga archivos ZIP uno por uno
+3. **Extracción**: Extrae cada archivo inmediatamente
+4. **Gestión**: Mueve ZIPs a carpeta temporal
+5. **Limpieza**: Elimina archivos temporales
+
+## 📊 Monitoreo de Progreso
+
+### Barras de Progreso
+- **Descarga**: Muestra progreso de descarga del archivo actual
+- **Extracción**: Muestra progreso de extracción del archivo actual
+- **Total**: Muestra progreso general del proceso
+
+### Información Detallada
+- Nombre del archivo siendo procesado
+- Porcentaje de progreso
+- Estado del proceso (Descargando/Extrayendo/Completado)
+
+## 🔒 Seguridad
+
+- **Autenticación JWT**: Tokens temporales para acceso al servidor
+- **Verificación de archivos**: Compara tamaños y fechas de modificación
+- **Manejo de errores**: Reintentos automáticos con backoff exponencial
+
+## 🐛 Solución de Problemas
+
+### Error de Descarga
+- Verificar conexión a internet
+- Comprobar que el servidor esté disponible
+- Revisar logs en la consola de desarrollador
+
+### Error de Extracción
+- Verificar que 7-Zip esté instalado
+- Comprobar permisos de escritura en la carpeta de destino
+- Revisar espacio disponible en disco
+
+### Archivos Corruptos
+- Usar función "Reparar" para reinstalar archivos
+- Verificar integridad de archivos descargados
+- Limpiar caché si es necesario
+
+## 🚀 Desarrollo
+
+### Ejecutar en Modo Desarrollo
+```bash
+npm run dev
+```
+
+### Construir para Producción
+```bash
+npm run build
+```
+
+### Ejecutar Pruebas
+```bash
+node test_patch_downloader.js
+```
+
+## 📝 Changelog
+
+### v2.0.0 - Descarga y Extracción Automática
+- ✅ Descarga automática de archivos ZIP
+- ✅ Extracción automática en carpeta de destino
+- ✅ Gestión de archivos temporales
+- ✅ Barras de progreso separadas
+- ✅ Limpieza automática de archivos temporales
+- ✅ Proceso optimizado archivo por archivo
+
+### v1.0.0 - Versión Inicial
+- ✅ Interfaz moderna y elegante
+- ✅ Selector de carpetas
+- ✅ Descarga básica de archivos
+- ✅ Lanzamiento del juego
+
+## 🤝 Contribuir
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+
+## 🙏 Agradecimientos
+
+- Electron por el framework de aplicaciones de escritorio
+- 7-Zip por la herramienta de compresión
+- La comunidad de Lineage 2 Terra
