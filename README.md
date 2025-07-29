@@ -190,10 +190,26 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 export const environment = {
   production: isProduction,
-  apiUrl: isProduction ? 'https://patch.l2terra.online' : 'http://localhost:8080',
-  secretKey: isProduction ? 'prod_secret_key' : 'dev_secret_key'
+  // API para rankings (PvP/PK)
+  apiUrl: isProduction ? 'https://api.l2terra.online' : 'http://localhost:8080',
+  // API para descargas de archivos
+  downloadUrl: 'https://patch.l2terra.online'
 };
 ```
+
+### APIs del Sistema
+
+El launcher utiliza **2 APIs diferentes**:
+
+1. **📊 API de Rankings** (`environment.apiUrl`):
+   - **Desarrollo**: `http://localhost:8080`
+   - **Producción**: `https://api.l2terra.online`
+   - **Uso**: Rankings PvP/PK, estadísticas del servidor
+
+2. **📦 API de Descargas** (`environment.downloadUrl`):
+   - **URL**: `https://patch.l2terra.online`
+   - **Uso**: Descarga de archivos ZIP, parches del juego
+   - **Comunicación**: Con `index.php` del servidor
 
 ### Configuración de Webpack
 

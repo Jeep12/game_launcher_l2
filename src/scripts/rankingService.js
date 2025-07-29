@@ -1,14 +1,11 @@
 /**
  * Servicio para manejar los rankings de PvP y PK
- * 
- * ⚠️ TEMPORALMENTE DESHABILITADO:
- * - Las peticiones a la API están deshabilitadas
- * - Se usan datos por defecto para evitar errores
- * - Para habilitar: restaurar el código original en getTopPvP() y getTopPK()
  */
+import { environment } from '../environments/enviroment.js';
+
 class RankingService {
   constructor() {
-    this.baseUrl = 'https://api.l2terra.online'; // Ajustar según tu endpoint
+    this.baseUrl = environment.apiUrl;
     this.cache = {
       pvp: null,
       pk: null,
@@ -18,23 +15,65 @@ class RankingService {
   }
 
   /**
-   * Obtiene el ranking de PvP (usando datos por defecto)
+   * Obtiene el ranking de PvP desde la API
    * @returns {Promise<Array>} Array de jugadores con posición, nombre y puntuación
    */
   async getTopPvP() {
-    // Usar datos por defecto temporalmente
-    console.log('📊 Usando datos por defecto para PvP (API deshabilitada)');
-    return this.getDefaultPvPRanking();
+    try {
+      console.log('📊 Obteniendo ranking PvP desde:', `${this.baseUrl}/api/game/ranking/top-pvp`);
+      
+      const response = await fetch(`${this.baseUrl}/api/game/ranking/top-pvp`);
+      
+      console.log(this.baseUrl)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('📊 Datos PvP recibidos:', data);
+      
+      // Transformar datos del formato API al formato esperado
+      const players = data.topPvp.map((player, index) => ({
+        position: index + 1,
+        name: player.name,
+        score: player.kills
+      }));
+      
+      return players;
+    } catch (error) {
+      console.error('Error obteniendo ranking PvP:', error);
+      return this.getDefaultPvPRanking();
+    }
   }
 
   /**
-   * Obtiene el ranking de PK (usando datos por defecto)
+   * Obtiene el ranking de PK desde la API
    * @returns {Promise<Array>} Array de jugadores con posición, nombre y puntuación
    */
   async getTopPK() {
-    // Usar datos por defecto temporalmente
-    console.log('📊 Usando datos por defecto para PK (API deshabilitada)');
-    return this.getDefaultPKRanking();
+    try {
+      console.log('📊 Obteniendo ranking PK desde:', `${this.baseUrl}/api/game/ranking/top-pk`);
+      
+      const response = await fetch(`${this.baseUrl}/api/game/ranking/top-pk`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('📊 Datos PK recibidos:', data);
+      
+      const players = data.topPk.map((player, index) => ({
+        position: index + 1,
+        name: player.name,
+        score: player.kills
+      }));
+      
+      return players;
+    } catch (error) {
+      console.error('Error obteniendo ranking PK:', error);
+      return this.getDefaultPKRanking();
+    }
   }
 
   /**
@@ -67,7 +106,7 @@ class RankingService {
     data.forEach(player => {
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>${player.position}</td>
+        <td style="font-weight: 700;">${player.position}</td>
         <td>${player.name}</td>
         <td>${player.score.toLocaleString()}</td>
       `;

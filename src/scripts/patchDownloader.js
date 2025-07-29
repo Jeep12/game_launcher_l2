@@ -3,7 +3,7 @@ import { environment } from '../environments/enviroment.js';
 
 class PatchDownloader {
   constructor() {
-    this.baseUrl = environment.apiUrl;
+    this.baseUrl = environment.downloadUrl;
     this.token = null;
     this.tokenExpiry = null;
     this.downloadQueue = [];

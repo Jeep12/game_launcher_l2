@@ -3,6 +3,8 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 export const environment = {
   production: isProduction,
-  apiUrl: 'https://patch.l2terra.online', // Siempre usar la URL correcta
-  secretKey: isProduction ? 'prod_secret_key' : 'dev_secret_key'
+  // API para rankings (PvP/PK)
+  apiUrl: isProduction ? 'https://l2terra.online' : 'https://l2terra.online',
+  // API para descargas de archivos
+  downloadUrl: 'https://patch.l2terra.online'
 };

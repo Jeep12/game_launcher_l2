@@ -6,11 +6,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:8080 https://patch.l2terra.online https://api.l2terra.online;">
+    content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:8080 https://patch.l2terra.online https://api.l2terra.online https://l2terra.online;">
   <script src="renderer.bundle.js" defer></script>
   <title>L2 Terra Launcher</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
   <div class="filter"></div>
   <!-- Custom Title Bar -->
@@ -18,17 +19,18 @@
     <!-- Left: Logo + Terra -->
     <div class="titlebar-left">
       <div class="img-logo" style="display: flex; align-items: center; gap: 8px;">
-        <img height="35px" src="assets/images/logos/Tlogo-terra.webp" alt="L2 Terra Logo">
-        <span class="terra-text l2font" style="color: #dabe64; font-weight: bold; font-size: 18px;">Terra</span>
+        <img height="30px" src="assets/images/logos/Tlogo-terra.webp" alt="L2 Terra Logo">
+        <span class="terra-text l2font"
+          style="color: #dabe64; font-weight: bold; font-size: 18px;font-family: 'l2font';"></span>
       </div>
     </div>
 
     <!-- Center: Navigation -->
     <div class="titlebar-center" style="display: flex; gap: 50px; align-items: center;padding: 10px;">
-    
-      <a href="#" class="nav-link" data-url="https://l2terra.online">Website</a>
-      <a href="#" class="nav-link">Community</a>
-      <a href="#" class="nav-link" data-url="https://discord.gg/wXnPMdStvW">Discord</a>
+
+      <a href="#" class="nav-link" data-url="https://l2terra.online" style="color: #dabe64; text-decoration: none;background:none !important;">Website</a>
+      <a href="#" class="nav-link" style="color: #dabe64; text-decoration: none;background:none !important;">Community</a>
+      <a href="#" class="nav-link" data-url="https://discord.gg/wXnPMdStvW" style="color: #dabe64; text-decoration: none;background:none !important;">Discord</a>
     </div>
 
     <!-- Right: Window Controls -->
@@ -50,14 +52,15 @@
     <div class="header">
       <!-- Menu Section (30% width) - RED -->
       <div class="menu">
-        <h3 class="menu-title">Menu</h3>
+        <img src="assets/images/logos/lineage2Terra_blanco.webp" alt="L2 Terra" class="logo">
+
+        <hr>
         <div class="menu-buttons">
           <button id="btnUpdate" class="menu-btn">Update</button>
           <button id="btnRepair" class="menu-btn">Repair</button>
           <button id="btnSelectFolder" class="menu-btn">Select Folder</button>
         </div>
       </div>
-
       <!-- Rankings Section (70% width) - YELLOW -->
       <div class="rankings">
         <!-- Top PVP (50% width) - GREEN -->
@@ -101,9 +104,9 @@
     </div>
 
     <!-- Panel Section (30% height) - BLUE -->
-         <div class="panel">
+    <div class="panel">
       <!-- Progress Bars Section (70% width) -->
-             <div class="progress-section">
+      <div class="progress-section">
         <div class="folder-section">
           <div class="folder-display" id="folderPath">Selected folder: No folder selected</div>
         </div>
@@ -120,7 +123,7 @@
       </div>
 
       <!-- Play Button Section (30% width) -->
-             <div class="button-section">
+      <div class="button-section">
         <div class="button-group">
           <button id="btnPlay" class="btn btn-play">PLAY</button>
         </div>
@@ -135,7 +138,8 @@
     <div class="nk-page-border-b"></div>
     <div class="nk-page-border-l"></div>
   </div>
-  
+  <img style="position: absolute; bottom: 0; right: 0; width: 100%; height: 300px;"
+    src="assets/images/backgrounds/footer-corner.webp" alt="Footer Corner" class="footer-corner">
   <!-- Toast Notification -->
   <div id="toast" class="toast">
     <div class="toast-content">

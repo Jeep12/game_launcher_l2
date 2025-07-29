@@ -737,7 +737,7 @@ function createWindow() {
     }
   });
 
-   mainWindow.webContents.openDevTools(); // Comentado para no abrir la consola automáticamente
+//   mainWindow.webContents.openDevTools(); // Comentado para no abrir la consola automáticamente
 }
 
 app.whenReady().then(createWindow);
