@@ -2,6 +2,23 @@
 
 Un launcher moderno y elegante para Lineage 2 Terra con funcionalidades avanzadas de descarga y actualización automática.
 
+## ⚡ Comandos Rápidos
+
+### 🚀 Desarrollo
+```bash
+npm run build:dev && npm start
+```
+
+### 🔧 Producción
+```bash
+npm run build:prod && npm run dist
+```
+
+### 🧹 Limpieza
+```bash
+npm run clean
+```
+
 ## 📋 Tabla de Contenidos
 
 - [🚀 Características](#-características)
@@ -43,31 +60,33 @@ game_launcher_l2/
 ├── 📁 src/
 │   ├── 📁 environments/
 │   │   └── enviroment.js          # Configuración de entorno (dev/prod)
-│   ├── 📁 js/
+│   ├── 📁 scripts/
 │   │   ├── patchDownloader.js     # Descargador de parches mejorado
 │   │   ├── gameLauncher.js        # Lógica principal del launcher
 │   │   ├── installer.js           # Instalador de archivos
 │   │   ├── folderSelector.js      # Selector de carpetas
 │   │   ├── externalLinks.js       # Manejo de enlaces externos
+│   │   ├── rankingService.js      # Servicio de rankings
 │   │   └── renderer.js            # Lógica del renderer process
-│   ├── 📁 static/
-│   │   ├── 📁 assets/
-│   │   │   ├── 📁 images/         # Imágenes y recursos visuales
-│   │   │   └── terraico1.ico      # Icono de la aplicación
-│   │   ├── 📁 css/
-│   │   │   ├── style.css          # Estilos principales
-│   │   │   └── fonts.css          # Configuración de fuentes
+│   ├── 📁 assets/
+│   │   ├── 📁 images/
+│   │   │   ├── 📁 backgrounds/    # Imágenes de fondo
+│   │   │   ├── 📁 icons/          # Iconos de la aplicación
+│   │   │   ├── 📁 logos/          # Logos de Terra
+│   │   │   └── 📁 videos/         # Videos y animaciones
+│   │   ├── 📁 styles/
+│   │   │   └── style.css          # Estilos principales
 │   │   ├── 📁 fonts/              # Fuentes personalizadas
-│   │   ├── 📁 views/
-│   │   │   └── error.html         # Página de error personalizada
-│   │   └── Tlogo-terra.webp       # Logo de Terra
+│   │   └── 📁 views/
+│   │       └── error.html         # Página de error personalizada
 │   └── preload.js                 # APIs de Electron (preload)
 ├── 📁 dist/                       # Archivos compilados (generado)
 ├── 📁 node_modules/               # Dependencias (generado)
 ├── main.js                        # Proceso principal de Electron
 ├── index.html                     # Interfaz principal
 ├── splash.html                    # Pantalla de carga
-├── webpack.config.js              # Configuración de Webpack
+├── webpack.config.dev.js          # Configuración Webpack desarrollo
+├── webpack.config.prod.js         # Configuración Webpack producción
 ├── package.json                   # Configuración del proyecto
 ├── package-lock.json              # Lock de dependencias
 ├── clean.bat                      # Script de limpieza para Windows
@@ -94,8 +113,13 @@ cd game_launcher_l2
 # 2. Instalar dependencias
 npm install
 
-# 3. Verificar instalación
+# 3. Probar en desarrollo
+npm run build:dev
 npm start
+
+# 4. Crear ejecutable (opcional)
+npm run build:prod
+npm run dist
 ```
 
 ### Configuración del Entorno
@@ -107,39 +131,43 @@ El proyecto utiliza variables de entorno para diferenciar entre desarrollo y pro
 
 ## ⚡ Comandos de Desarrollo
 
-### 🚀 Comandos Principales
+### 🚀 Flujo de Desarrollo
 
 ```bash
-# Ejecutar en modo desarrollo
+# 1. Limpiar archivos compilados
+rm -rf dist/ renderer.bundle.js styles.css assets/ views/ preload.js *.png *.ttf *.woff2
+
+# 2. Compilar para desarrollo
+npm run build:dev
+
+# 3. Ejecutar en modo desarrollo
 npm start
 
-# Compilar para desarrollo
-npm run build
-
-# Compilar para producción
-npm run build:prod
-
-# Compilar y crear instalador
-npm run dist
-
-# Limpiar carpeta dist
-npm run clean
-
-# Modo watch (desarrollo)
+# 4. Modo watch (opcional - recompila automáticamente)
 npm run watch
 ```
 
-### 🔧 Comandos de Build
+### 🔧 Flujo de Producción
 
 ```bash
-# Build completo para producción
+# 1. Limpiar archivos compilados
+rm -rf dist/ renderer.bundle.js styles.css assets/ views/ preload.js *.png *.ttf *.woff2
+
+# 2. Compilar para producción
 npm run build:prod
 
-# Crear instalador Windows
+# 3. Crear instalador Windows
 npm run dist
+```
 
-# Limpiar y rebuild
-npm run clean && npm run dist
+### 🧹 Comandos de Limpieza
+
+```bash
+# Limpiar todo (desarrollo y producción)
+npm run clean
+
+# Limpiar manualmente
+rm -rf dist/ renderer.bundle.js styles.css assets/ views/ preload.js *.png *.ttf *.woff2
 ```
 
 ### 🧹 Comandos de Limpieza
@@ -167,10 +195,19 @@ export const environment = {
 };
 ```
 
-### Configuración de Webpack (`webpack.config.js`)
+### Configuración de Webpack
 
-- **Modo**: Automático basado en `NODE_ENV`
+#### `webpack.config.dev.js` (Desarrollo)
+- **Modo**: `development`
+- **Output**: Raíz del proyecto
+- **Devtool**: `source-map`
+- **Clean**: `false`
+
+#### `webpack.config.prod.js` (Producción)
+- **Modo**: `production`
 - **Output**: Carpeta `dist/`
+- **Devtool**: `false`
+- **Clean**: `true`
 - **Plugins personalizados**: Copia `main.js` sin procesar
 - **Assets**: Copia archivos estáticos automáticamente
 
@@ -226,8 +263,8 @@ graph TD
     C --> D{¿Necesita Actualización?}
     D -->|Sí| E[Descargar Archivo ZIP]
     D -->|No| F[Archivo Actualizado]
-    E --> G[Mover ZIP a Temp]
-    G --> H[Extraer con 7-Zip/PowerShell]
+    E --> G[Extraer ZIP Inmediatamente]
+    G --> H[Copiar ZIP a Carpeta Temporal]
     H --> I[Verificar Extracción]
     I --> J[Limpiar ZIP Temporal]
     J --> K{¿Más Archivos?}
@@ -236,6 +273,15 @@ graph TD
     L --> M[Actualización Completada]
     F --> K
 ```
+
+### Flujo Paso a Paso
+
+1. **Descarga**: Se descarga el archivo ZIP desde el servidor
+2. **Extracción**: Se extrae inmediatamente el contenido del ZIP
+3. **Copia**: Se copia el ZIP a carpeta temporal para organización
+4. **Verificación**: Se verifica que la extracción fue exitosa
+5. **Limpieza**: Se elimina el ZIP temporal
+6. **Siguiente**: Se repite para el siguiente archivo
 
 ### Detalles del Proceso
 
@@ -249,13 +295,14 @@ graph TD
    - Muestra progreso de descarga en tiempo real
    - Maneja errores con reintentos automáticos
 
-3. **Extracción Optimizada**:
+3. **Extracción Inmediata**:
+   - Extrae cada ZIP inmediatamente después de descargarlo
    - Usa 7-Zip si está disponible
    - Fallback a PowerShell si es necesario
-   - Extrae cada archivo inmediatamente después de descargarlo
+   - Muestra progreso de extracción en tiempo real
 
 4. **Gestión de Archivos**:
-   - Mueve ZIPs a carpeta `temp_download`
+   - Copia ZIPs a carpeta `temp_download` para organización
    - Mantiene archivos organizados durante el proceso
    - Limpia archivos temporales al finalizar
 
@@ -381,9 +428,12 @@ npm run dist
 ### Estructura de Archivos Clave
 
 - **`main.js`**: Proceso principal de Electron
-- **`webpack.config.js`**: Configuración de build
+- **`webpack.config.dev.js`**: Configuración de build para desarrollo
+- **`webpack.config.prod.js`**: Configuración de build para producción
 - **`package.json`**: Scripts y dependencias
 - **`src/environments/enviroment.js`**: Configuración de entorno
+- **`src/scripts/renderer.js`**: Punto de entrada del renderer
+- **`src/assets/styles/style.css`**: Estilos principales
 
 ### Variables de Entorno
 
@@ -392,9 +442,11 @@ npm run dist
 
 ### Plugins de Webpack
 
-- **`CopyMainJs`**: Copia `main.js` sin procesar
-- **`CreateDistPackageJson`**: Crea `package.json` en `dist`
-- **`CopyWebpackPlugin`**: Copia archivos estáticos
+- **`CopyWebpackPlugin`**: Copia archivos estáticos automáticamente
+- **`MiniCssExtractPlugin`**: Extrae CSS a archivos separados
+- **`webpack.DefinePlugin`**: Define variables de entorno
+- **`CopyMainJs`**: Copia `main.js` sin procesar (solo producción)
+- **`CreateDistPackageJson`**: Crea `package.json` en `dist` (solo producción)
 
 ## 🤝 Contribución
 

@@ -65,7 +65,7 @@ function showErrorWindow(msg = 'Ocurrió un error.') {
   });
   errorWin.setMenu(null);
 
-  errorWin.loadFile(resolveAssetPath('static', 'views', 'error.html'));
+  errorWin.loadFile(resolveAssetPath('views', 'error.html'));
 
   errorWin.webContents.once('did-finish-load', () => {
     errorWin.webContents.executeJavaScript(`
@@ -82,7 +82,7 @@ function createWindow() {
     alwaysOnTop: true,
     resizable: false,
     backgroundColor: '#212121',
-    icon: resolveAssetPath('static', 'assets', 'terraico1.ico'),
+    icon: resolveAssetPath('assets', 'images', 'icons', 'TCOLORICO.ico'),
   });
 
   splash.loadFile(resolveAssetPath('splash.html'));
@@ -96,7 +96,7 @@ function createWindow() {
     backgroundColor: '#212121',
     fullscreenable: false,
     maximizable: false,
-    icon: resolveAssetPath('static', 'assets', 'terraico1.ico'),
+    icon: resolveAssetPath('assets', 'images', 'icons', 'TCOLORICO.ico'),
     webPreferences: {
       preload: resolveAssetPath('preload.js'),
       nodeIntegration: false,

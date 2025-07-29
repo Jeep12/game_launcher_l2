@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "build": "webpack --config webpack.config.js",
-    "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.js",
-    "watch": "webpack --watch --config webpack.config.js",
+    "start": "npm run build:dev && electron .",
+    "build": "webpack --config webpack.config.dev.js",
+    "build:dev": "webpack --config webpack.config.dev.js",
+    "build:prod": "webpack --config webpack.config.prod.js",
+    "watch": "webpack --watch --config webpack.config.dev.js",
     "dist": "npm run build:prod && cd dist && electron-builder",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist && rimraf renderer.bundle.js && rimraf styles.css && rimraf assets && rimraf views && rimraf preload.js"
   },
   "keywords": [],
   "author": "",
