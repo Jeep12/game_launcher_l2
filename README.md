@@ -1,180 +1,418 @@
-# L2 Terra Launcher
+# 🎮 Launcher L2 Terra
 
 Un launcher moderno y elegante para Lineage 2 Terra con funcionalidades avanzadas de descarga y actualización automática.
 
-## 🚀 Características Principales
+## 📋 Tabla de Contenidos
 
-### ✨ Descarga y Extracción Automática
-- **Descarga automática de archivos ZIP**: Descarga archivos de parches desde el servidor
-- **Extracción automática**: Descomprime automáticamente los archivos en la carpeta de destino
-- **Gestión de archivos temporales**: Los ZIPs se mueven a una carpeta `temp_download` durante el proceso
-- **Limpieza automática**: Elimina la carpeta temporal al finalizar el proceso
+- [🚀 Características](#-características)
+- [📁 Estructura del Proyecto](#-estructura-del-proyecto)
+- [🛠️ Instalación y Configuración](#️-instalación-y-configuración)
+- [⚡ Comandos de Desarrollo](#-comandos-de-desarrollo)
+- [🔧 Configuración del Entorno](#-configuración-del-entorno)
+- [📦 Proceso de Build](#-proceso-de-build)
+- [🎯 Flujo de Descarga e Instalación](#-flujo-de-descarga-e-instalación)
+- [🐛 Solución de Problemas](#-solución-de-problemas)
+- [📊 Monitoreo y Logs](#-monitoreo-y-logs)
 
-### 📊 Barras de Progreso Separadas
-- **Barra de progreso de descarga**: Muestra el progreso de descarga de cada archivo
-- **Barra de progreso de extracción**: Muestra el progreso de extracción de cada archivo
-- **Progreso total**: Barra principal que muestra el progreso general del proceso
+## 🚀 Características
+
+### ✨ Funcionalidades Principales
+- **Descarga automática de parches**: Descarga archivos ZIP desde el servidor
+- **Extracción automática**: Descomprime automáticamente en la carpeta de destino
+- **Gestión inteligente de archivos**: Mueve ZIPs a carpeta temporal durante el proceso
+- **Limpieza automática**: Elimina archivos temporales al finalizar
+- **Interfaz moderna**: Diseño elegante con animaciones y efectos visuales
+
+### 📊 Sistema de Progreso
+- **Barra de progreso de descarga**: Muestra progreso de descarga por archivo
+- **Barra de progreso de extracción**: Muestra progreso de extracción por archivo
+- **Progreso total**: Barra principal con progreso general del proceso
+- **Información detallada**: Nombre del archivo, porcentaje y estado actual
 
 ### 🔄 Proceso Optimizado
-1. **Verificación**: Compara archivos locales con los del servidor
-2. **Descarga**: Descarga solo los archivos que necesitan actualización
+1. **Verificación**: Compara archivos locales con servidor
+2. **Descarga**: Descarga solo archivos que necesitan actualización
 3. **Extracción**: Extrae cada archivo inmediatamente después de descargarlo
-4. **Gestión**: Mueve los ZIPs a carpeta temporal
+4. **Gestión**: Mueve ZIPs a carpeta temporal durante el proceso
 5. **Limpieza**: Elimina archivos temporales al finalizar
-
-## 🛠️ Instalación
-
-### Requisitos
-- Node.js 16 o superior
-- npm o yarn
-- Windows 10/11 (para la extracción con 7-Zip o PowerShell)
-
-### Instalación
-```bash
-# Clonar el repositorio
-git clone <repository-url>
-cd game_launcher_l2
-
-# Instalar dependencias
-npm install
-
-# Ejecutar en modo desarrollo
-npm run dev
-
-# Construir para producción
-npm run build
-```
 
 ## 📁 Estructura del Proyecto
 
 ```
 game_launcher_l2/
-├── src/
-│   ├── js/
-│   │   ├── patchDownloader.js    # Descargador de parches mejorado
-│   │   ├── gameLauncher.js       # Lógica principal del launcher
-│   │   ├── installer.js          # Instalador de archivos
-│   │   └── folderSelector.js     # Selector de carpetas
-│   ├── static/
-│   │   ├── css/
-│   │   │   └── style.css         # Estilos modernos
-│   │   └── views/
-│   └── preload.js               # APIs de Electron
-├── main.js                      # Proceso principal de Electron
-├── index.html                   # Interfaz principal
-└── package.json
+├── 📁 src/
+│   ├── 📁 environments/
+│   │   └── enviroment.js          # Configuración de entorno (dev/prod)
+│   ├── 📁 js/
+│   │   ├── patchDownloader.js     # Descargador de parches mejorado
+│   │   ├── gameLauncher.js        # Lógica principal del launcher
+│   │   ├── installer.js           # Instalador de archivos
+│   │   ├── folderSelector.js      # Selector de carpetas
+│   │   ├── externalLinks.js       # Manejo de enlaces externos
+│   │   └── renderer.js            # Lógica del renderer process
+│   ├── 📁 static/
+│   │   ├── 📁 assets/
+│   │   │   ├── 📁 images/         # Imágenes y recursos visuales
+│   │   │   └── terraico1.ico      # Icono de la aplicación
+│   │   ├── 📁 css/
+│   │   │   ├── style.css          # Estilos principales
+│   │   │   └── fonts.css          # Configuración de fuentes
+│   │   ├── 📁 fonts/              # Fuentes personalizadas
+│   │   ├── 📁 views/
+│   │   │   └── error.html         # Página de error personalizada
+│   │   └── Tlogo-terra.webp       # Logo de Terra
+│   └── preload.js                 # APIs de Electron (preload)
+├── 📁 dist/                       # Archivos compilados (generado)
+├── 📁 node_modules/               # Dependencias (generado)
+├── main.js                        # Proceso principal de Electron
+├── index.html                     # Interfaz principal
+├── splash.html                    # Pantalla de carga
+├── webpack.config.js              # Configuración de Webpack
+├── package.json                   # Configuración del proyecto
+├── package-lock.json              # Lock de dependencias
+├── clean.bat                      # Script de limpieza para Windows
+├── .gitignore                     # Archivos ignorados por Git
+├── LICENSE                        # Licencia del proyecto
+└── README.md                      # Este archivo
 ```
 
-## 🔧 Configuración
+## 🛠️ Instalación y Configuración
 
-### Servidor de Parches
-El launcher se conecta a `https://patch.l2terra.online/` para obtener:
-- Lista de archivos disponibles
-- Tokens JWT para autenticación
-- Descarga de archivos ZIP
+### Requisitos Previos
+- **Node.js**: Versión 16 o superior
+- **npm**: Gestor de paquetes de Node.js
+- **Windows**: 10/11 (para extracción con 7-Zip o PowerShell)
+- **Git**: Para clonar el repositorio
 
-### Configuración de Extracción
-El sistema utiliza:
-1. **7-Zip** (preferido): Si está instalado en `C:\Program Files\7-Zip\7z.exe`
-2. **PowerShell**: Como fallback para extraer archivos ZIP
+### Instalación Paso a Paso
 
-## 🎯 Uso
+```bash
+# 1. Clonar el repositorio
+git clone <repository-url>
+cd game_launcher_l2
 
-### Interfaz Principal
-1. **Seleccionar Carpeta**: Elige la carpeta donde está instalado L2
-2. **Actualizar**: Descarga e instala automáticamente los parches
-3. **Jugar**: Lanza el juego directamente
-4. **Reparar**: Reinstala archivos corruptos
+# 2. Instalar dependencias
+npm install
+
+# 3. Verificar instalación
+npm start
+```
+
+### Configuración del Entorno
+
+El proyecto utiliza variables de entorno para diferenciar entre desarrollo y producción:
+
+- **Desarrollo**: `NODE_ENV=development`
+- **Producción**: `NODE_ENV=production`
+
+## ⚡ Comandos de Desarrollo
+
+### 🚀 Comandos Principales
+
+```bash
+# Ejecutar en modo desarrollo
+npm start
+
+# Compilar para desarrollo
+npm run build
+
+# Compilar para producción
+npm run build:prod
+
+# Compilar y crear instalador
+npm run dist
+
+# Limpiar carpeta dist
+npm run clean
+
+# Modo watch (desarrollo)
+npm run watch
+```
+
+### 🔧 Comandos de Build
+
+```bash
+# Build completo para producción
+npm run build:prod
+
+# Crear instalador Windows
+npm run dist
+
+# Limpiar y rebuild
+npm run clean && npm run dist
+```
+
+### 🧹 Comandos de Limpieza
+
+```bash
+# Limpiar carpeta dist
+npm run clean
+
+# Usar script de limpieza (Windows)
+.\clean.bat
+```
+
+## 🔧 Configuración del Entorno
+
+### Archivo `src/environments/enviroment.js`
+
+```javascript
+// Configuración automática basada en NODE_ENV
+const isProduction = process.env.NODE_ENV === 'production';
+
+export const environment = {
+  production: isProduction,
+  apiUrl: isProduction ? 'https://patch.l2terra.online' : 'http://localhost:8080',
+  secretKey: isProduction ? 'prod_secret_key' : 'dev_secret_key'
+};
+```
+
+### Configuración de Webpack (`webpack.config.js`)
+
+- **Modo**: Automático basado en `NODE_ENV`
+- **Output**: Carpeta `dist/`
+- **Plugins personalizados**: Copia `main.js` sin procesar
+- **Assets**: Copia archivos estáticos automáticamente
+
+## 📦 Proceso de Build
+
+### Flujo de Build Completo
+
+1. **Webpack Compilation**:
+   ```bash
+   npm run build:prod
+   ```
+   - Compila JavaScript y CSS
+   - Copia archivos estáticos a `dist/`
+   - Copia `main.js` sin procesar
+   - Crea `package.json` simplificado en `dist/`
+   - Copia módulo `electron` a `dist/node_modules/`
+
+2. **Electron Builder**:
+   ```bash
+   npm run dist
+   ```
+   - Ejecuta `electron-builder` desde `dist/`
+   - Crea instalador NSIS para Windows
+   - Genera `app.asar` con todos los archivos
+
+### Estructura del Build Final
+
+```
+dist/
+├── main.js                    # Proceso principal (sin procesar)
+├── package.json               # Configuración para electron-builder
+├── node_modules/electron/     # Módulo electron copiado
+├── index.html                 # Interfaz principal
+├── splash.html                # Pantalla de carga
+├── preload.js                 # Script de preload
+├── renderer.bundle.js         # JavaScript compilado
+├── styles.css                 # CSS compilado
+└── static/                    # Archivos estáticos
+    ├── assets/
+    ├── css/
+    ├── fonts/
+    └── views/
+```
+
+## 🎯 Flujo de Descarga e Instalación
 
 ### Proceso de Actualización
-1. **Verificación**: Compara archivos locales con servidor
-2. **Descarga**: Descarga archivos ZIP uno por uno
-3. **Extracción**: Extrae cada archivo inmediatamente
-4. **Gestión**: Mueve ZIPs a carpeta temporal
-5. **Limpieza**: Elimina archivos temporales
 
-## 📊 Monitoreo de Progreso
+```mermaid
+graph TD
+    A[Iniciar Actualización] --> B[Verificar Archivos Locales]
+    B --> C[Comparar con Servidor]
+    C --> D{¿Necesita Actualización?}
+    D -->|Sí| E[Descargar Archivo ZIP]
+    D -->|No| F[Archivo Actualizado]
+    E --> G[Mover ZIP a Temp]
+    G --> H[Extraer con 7-Zip/PowerShell]
+    H --> I[Verificar Extracción]
+    I --> J[Limpiar ZIP Temporal]
+    J --> K{¿Más Archivos?}
+    K -->|Sí| E
+    K -->|No| L[Limpieza Final]
+    L --> M[Actualización Completada]
+    F --> K
+```
 
-### Barras de Progreso
-- **Descarga**: Muestra progreso de descarga del archivo actual
-- **Extracción**: Muestra progreso de extracción del archivo actual
-- **Total**: Muestra progreso general del proceso
+### Detalles del Proceso
 
-### Información Detallada
-- Nombre del archivo siendo procesado
-- Porcentaje de progreso
-- Estado del proceso (Descargando/Extrayendo/Completado)
+1. **Verificación Inicial**:
+   - Compara tamaños de archivos locales
+   - Verifica fechas de modificación
+   - Identifica archivos que necesitan actualización
 
-## 🔒 Seguridad
+2. **Descarga Inteligente**:
+   - Descarga archivos ZIP uno por uno
+   - Muestra progreso de descarga en tiempo real
+   - Maneja errores con reintentos automáticos
 
-- **Autenticación JWT**: Tokens temporales para acceso al servidor
-- **Verificación de archivos**: Compara tamaños y fechas de modificación
-- **Manejo de errores**: Reintentos automáticos con backoff exponencial
+3. **Extracción Optimizada**:
+   - Usa 7-Zip si está disponible
+   - Fallback a PowerShell si es necesario
+   - Extrae cada archivo inmediatamente después de descargarlo
+
+4. **Gestión de Archivos**:
+   - Mueve ZIPs a carpeta `temp_download`
+   - Mantiene archivos organizados durante el proceso
+   - Limpia archivos temporales al finalizar
 
 ## 🐛 Solución de Problemas
 
-### Error de Descarga
-- Verificar conexión a internet
-- Comprobar que el servidor esté disponible
-- Revisar logs en la consola de desarrollador
+### Errores Comunes y Soluciones
 
-### Error de Extracción
-- Verificar que 7-Zip esté instalado
-- Comprobar permisos de escritura en la carpeta de destino
-- Revisar espacio disponible en disco
-
-### Archivos Corruptos
-- Usar función "Reparar" para reinstalar archivos
-- Verificar integridad de archivos descargados
-- Limpiar caché si es necesario
-
-## 🚀 Desarrollo
-
-### Ejecutar en Modo Desarrollo
+#### ❌ Error: `ERR_FILE_NOT_FOUND`
+**Causa**: Archivos no encontrados en desarrollo
+**Solución**:
 ```bash
-npm run dev
-```
-
-### Construir para Producción
-```bash
+npm run clean
 npm run build
+npm start
 ```
 
-### Ejecutar Pruebas
+#### ❌ Error: `EBUSY: resource busy or locked`
+**Causa**: Proceso de Electron aún ejecutándose
+**Solución**:
 ```bash
-node test_patch_downloader.js
+# Usar script de limpieza
+.\clean.bat
+
+# O manualmente
+taskkill /f /im "Launcher-Terra.exe"
+taskkill /f /im "electron.exe"
+rmdir /s /q "dist"
 ```
 
-## 📝 Changelog
+#### ❌ Error: `Unable to load preload script`
+**Causa**: `main.js` no encuentra archivos en producción
+**Solución**:
+```bash
+npm run clean
+npm run dist
+```
 
-### v2.0.0 - Descarga y Extracción Automática
-- ✅ Descarga automática de archivos ZIP
-- ✅ Extracción automática en carpeta de destino
-- ✅ Gestión de archivos temporales
-- ✅ Barras de progreso separadas
-- ✅ Limpieza automática de archivos temporales
-- ✅ Proceso optimizado archivo por archivo
+#### ❌ Error: `Cannot compute electron version`
+**Causa**: Módulo electron no encontrado
+**Solución**:
+```bash
+npm install
+npm run dist
+```
 
-### v1.0.0 - Versión Inicial
-- ✅ Interfaz moderna y elegante
-- ✅ Selector de carpetas
-- ✅ Descarga básica de archivos
-- ✅ Lanzamiento del juego
+### Verificación de Instalación
 
-## 🤝 Contribuir
+```bash
+# Verificar que la aplicación se instala correctamente
+npm run dist
+# Instalar el .exe generado
+# Verificar que abre sin errores
+```
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+## 📊 Monitoreo y Logs
 
-## 📄 Licencia
+### Logs de Desarrollo
 
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
+```bash
+# Ver logs en tiempo real
+npm start
+# Abrir DevTools (F12) para ver logs detallados
+```
 
-## 🙏 Agradecimientos
+### Logs de Producción
 
-- Electron por el framework de aplicaciones de escritorio
-- 7-Zip por la herramienta de compresión
-- La comunidad de Lineage 2 Terra
+Los logs de producción se pueden encontrar en:
+- **Windows**: `%APPDATA%\Launcher-L2-Terra\logs\`
+- **Consola**: Abrir DevTools en la aplicación instalada
+
+### Información de Debug
+
+```javascript
+// En la consola de desarrollador
+console.log('Estado de descarga:', downloadStatus);
+console.log('Progreso:', progress);
+console.log('Errores:', errors);
+```
+
+## 🔒 Seguridad
+
+### Autenticación
+- **JWT Tokens**: Autenticación temporal con el servidor
+- **Verificación de archivos**: Compara hashes y tamaños
+- **Manejo seguro de errores**: No expone información sensible
+
+### Validaciones
+- **Verificación de permisos**: Comprueba permisos de escritura
+- **Validación de rutas**: Previene path traversal
+- **Sanitización de inputs**: Limpia entradas del usuario
+
+## 🚀 Despliegue
+
+### Crear Instalador
+
+```bash
+# Build completo y crear instalador
+npm run dist
+
+# El instalador se genera en:
+# dist/Launcher-L2-Terra Setup 1.0.0.exe
+```
+
+### Distribución
+
+1. **Build para producción**:
+   ```bash
+   npm run dist
+   ```
+
+2. **Instalador generado**:
+   - Ubicación: `dist/Launcher-L2-Terra Setup 1.0.0.exe`
+   - Tamaño: ~200MB (incluye Electron runtime)
+   - Compatibilidad: Windows 10/11
+
+3. **Instalación**:
+   - Ejecutar como administrador
+   - Instalación automática en `Program Files`
+   - Acceso directo en escritorio
+
+## 📝 Notas de Desarrollo
+
+### Estructura de Archivos Clave
+
+- **`main.js`**: Proceso principal de Electron
+- **`webpack.config.js`**: Configuración de build
+- **`package.json`**: Scripts y dependencias
+- **`src/environments/enviroment.js`**: Configuración de entorno
+
+### Variables de Entorno
+
+- **`NODE_ENV`**: Controla modo dev/prod
+- **`process.env.NODE_ENV`**: Disponible en código cliente
+
+### Plugins de Webpack
+
+- **`CopyMainJs`**: Copia `main.js` sin procesar
+- **`CreateDistPackageJson`**: Crea `package.json` en `dist`
+- **`CopyWebpackPlugin`**: Copia archivos estáticos
+
+## 🤝 Contribución
+
+### Flujo de Desarrollo
+
+1. **Fork del proyecto**
+2. **Crear rama feature**: `git checkout -b feature/nueva-funcionalidad`
+3. **Desarrollar**: Hacer cambios y commits
+4. **Probar**: `npm start` y `npm run dist`
+5. **Pull Request**: Enviar cambios para revisión
+
+### Estándares de Código
+
+- **JavaScript**: ES6+ con módulos
+- **CSS**: Estilos modulares
+- **HTML**: Semántico y accesible
+- **Commits**: Mensajes descriptivos en español
+
+---
+
+**Desarrollado con ❤️ para la comunidad de Lineage 2 Terra**

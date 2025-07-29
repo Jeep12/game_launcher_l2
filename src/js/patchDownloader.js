@@ -1,8 +1,9 @@
 // patchDownloader.js
+import { environment } from '../environments/enviroment.js';
 
 class PatchDownloader {
   constructor() {
-    this.baseUrl = 'https://patch.l2terra.online/';
+    this.baseUrl = environment.apiUrl;
     this.token = null;
     this.tokenExpiry = null;
     this.downloadQueue = [];

@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "start": "set NODE_ENV=development && electron .",
+    "start": "electron .",
     "build": "webpack --config webpack.config.js",
-    "build:clean": "rimraf dist && webpack --config webpack.config.js",
-    "dist": "cross-env NODE_ENV=production electron-builder",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:prod": "cross-env NODE_ENV=production webpack --config webpack.config.js",
     "watch": "webpack --watch --config webpack.config.js",
-    "dev": "concurrently \"npm run watch\" \"npm start\""
+    "dist": "npm run build:prod && cd dist && electron-builder",
+    "clean": "rimraf dist"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +23,7 @@
     "css-loader": "^7.1.2",
     "electron": "^28.3.3",
     "electron-builder": "^26.0.12",
+    "electron-packager": "^17.1.2",
     "electron-reload": "^2.0.0-alpha.1",
     "electron-reloader": "^1.2.3",
     "mini-css-extract-plugin": "^2.9.2",
@@ -55,41 +55,15 @@
     "appId": "L2Terra",
     "productName": "Launcher Terra",
     "files": [
-      "index.html",
-      "main.js",
-      "splash.html",
-      "dist/**/*",
-      "preload.js",
-      "!node_modules/**/*.md",
-      "!node_modules/**/*.txt",
-      "!node_modules/**/*.map",
-      "!node_modules/**/test/**/*",
-      "!node_modules/**/tests/**/*",
-      "!node_modules/**/docs/**/*",
-      "!node_modules/**/examples/**/*"
+      "**/*"
     ],
     "directories": {
-      "output": "dist"
+      "output": "../",
+      "app": "dist"
     },
     "win": {
-      "target": [
-        "nsis"
-      ],
+      "target": "nsis",
       "requestedExecutionLevel": "requireAdministrator"
-    },
-    "mac": {
-      "icon": "src/static/assets/images/images/Tlogo-terra.webp",
-      "category": "public.app-category.utilities",
-      "target": [
-        "dmg"
-      ]
-    },
-    "linux": {
-      "icon": "src/static/assets/images/images/Tlogo-terra.webp",
-      "target": [
-        "AppImage",
-        "deb"
-      ]
     }
   }
 }

@@ -6,6 +6,7 @@ import './externalLinks.js';
 
 import { initFolderSelector } from './folderSelector';
 import { setupDownloadButton, gameLauncher } from './gameLauncher.js';
+import RankingService from './rankingService.js';
 
 // Funcionalidad para la barra de título personalizada
 function initTitleBarControls() {
@@ -47,6 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Exponer gameLauncher globalmente para que folderSelector pueda acceder
   window.gameLauncher = gameLauncher;
   
-  // Cargar rankings
-  gameLauncher.loadRankings();
+  // Inicializar y cargar rankings
+  const rankingService = new RankingService();
+  rankingService.updateRankings();
+  
+  // Actualizar rankings cada 5 minutos
+  setInterval(() => {
+    rankingService.updateRankings();
+  }, 5 * 60 * 1000);
 });

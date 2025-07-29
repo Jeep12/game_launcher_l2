@@ -29,9 +29,11 @@ function getDirectorySize(dirPath) {
 }
 
 // 🧠 Hot reload para desarrollo
-try {
-  require('electron-reloader')(module);
-} catch (_) {}
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    require('electron-reloader')(module);
+  } catch (_) {}
+}
 
 let mainWindow;
 let splash;
@@ -41,8 +43,8 @@ function resolveAssetPath(...segments) {
   if (isDev) {
     return path.join(__dirname, ...segments);
   } else {
-    // En producción, los archivos están en process.resourcesPath
-    return path.join(process.resourcesPath, 'app', ...segments);
+    // En producción, los archivos están en la raíz del asar
+    return path.join(__dirname, ...segments);
   }
 }
 
@@ -63,7 +65,7 @@ function showErrorWindow(msg = 'Ocurrió un error.') {
   });
   errorWin.setMenu(null);
 
-  errorWin.loadFile(resolveAssetPath('src', 'static', 'views', 'error.html'));
+  errorWin.loadFile(resolveAssetPath('static', 'views', 'error.html'));
 
   errorWin.webContents.once('did-finish-load', () => {
     errorWin.webContents.executeJavaScript(`
@@ -80,7 +82,7 @@ function createWindow() {
     alwaysOnTop: true,
     resizable: false,
     backgroundColor: '#212121',
-    icon: resolveAssetPath('src', 'static', 'assets', 'terraico1.ico'),
+    icon: resolveAssetPath('static', 'assets', 'terraico1.ico'),
   });
 
   splash.loadFile(resolveAssetPath('splash.html'));
@@ -94,9 +96,9 @@ function createWindow() {
     backgroundColor: '#212121',
     fullscreenable: false,
     maximizable: false,
-    icon: resolveAssetPath('src', 'static', 'assets', 'terraico1.ico'),
+    icon: resolveAssetPath('static', 'assets', 'terraico1.ico'),
     webPreferences: {
-      preload: resolveAssetPath('src', 'preload.js'),
+      preload: resolveAssetPath('preload.js'),
       nodeIntegration: false,
       contextIsolation: true,
       sandbox: true,
