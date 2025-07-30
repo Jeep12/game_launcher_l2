@@ -9,6 +9,9 @@
     "build:prod": "webpack --config webpack.config.prod.js",
     "watch": "webpack --watch --config webpack.config.dev.js",
     "dist": "npm run build:prod && cd dist && electron-builder",
+    "dist:inno": "npm run build:prod && cd dist && iscc ../installer.iss",
+    "dist:packager": "npm run build:prod && electron-packager dist Launcher-Terra --platform=win32 --arch=x64 --out=../ --overwrite",
+    "dist:packager-nsis": "npm run dist:packager && makensis ../custom-installer.nsi",
     "clean": "rimraf dist && rimraf renderer.bundle.js && rimraf styles.css && rimraf assets && rimraf views && rimraf preload.js"
   },
   "keywords": [],
@@ -55,6 +58,8 @@
   "build": {
     "appId": "L2Terra",
     "productName": "Launcher Terra",
+    "icon": "assets/images/icons/iconexe.ico",
+
     "files": [
       "**/*"
     ],

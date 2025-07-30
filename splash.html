@@ -7,7 +7,7 @@
     <style>
         body {
             margin: 0;
-            background-color: #212121;
+            background: linear-gradient(to bottom, #0f0f0f, #000000);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -47,10 +47,13 @@
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 opacity: 0.3;
                 transform: scale(0.8);
             }
+
             50% {
                 opacity: 1;
                 transform: scale(1.2);

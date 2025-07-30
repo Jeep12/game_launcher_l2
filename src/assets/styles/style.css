@@ -293,6 +293,7 @@ body::before {
   border-collapse: collapse;
   font-size: 12px;
   cursor: pointer;
+  font-weight: 700;
 }
 
 .ranking-table th {
