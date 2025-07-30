@@ -1,5 +1,20 @@
+/build/*
 /dist/*
+/temp/*
 /node_modules/
 .vscode/
 .idea/
 /environments/*
+
+# Archivos generados en desarrollo (no se suben al repo)
+renderer.bundle.js
+styles.css
+*.map
+assets/
+views/
+preload.js
+*.ttf
+*.woff
+*.woff2
+*.png
+*.webp

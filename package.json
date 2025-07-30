@@ -3,16 +3,18 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "start": "npm run build:dev && electron .",
+    "start": "npm run build:dev && cd build && electron .",
     "build": "webpack --config webpack.config.dev.js",
     "build:dev": "webpack --config webpack.config.dev.js",
     "build:prod": "webpack --config webpack.config.prod.js",
     "watch": "webpack --watch --config webpack.config.dev.js",
-    "dist": "npm run build:prod && cd dist && electron-builder",
-    "dist:inno": "npm run build:prod && cd dist && iscc ../installer.iss",
-    "dist:packager": "npm run build:prod && electron-packager dist Launcher-Terra --platform=win32 --arch=x64 --out=../ --overwrite",
+    "dist": "npm run build:prod && cd build && electron-builder",
+    "dist:inno": "npm run build:prod && iscc installer.iss",
+    "dist:packager": "npm run build:prod && electron-packager build Launcher-Terra --platform=win32 --arch=x64 --out=../ --overwrite",
     "dist:packager-nsis": "npm run dist:packager && makensis ../custom-installer.nsi",
-    "clean": "rimraf dist && rimraf renderer.bundle.js && rimraf styles.css && rimraf assets && rimraf views && rimraf preload.js"
+    "clean": "rimraf build && rimraf dist && rimraf temp && rimraf renderer.bundle.js && rimraf styles.css && rimraf assets && rimraf views && rimraf preload.js",
+    "clean:dev": "rimraf *.ttf *.woff *.woff2 *.png *.webp *.map",
+    "clean:all": "npm run clean && npm run clean:dev"
   },
   "keywords": [],
   "author": "",
@@ -58,14 +60,13 @@
   "build": {
     "appId": "L2Terra",
     "productName": "Launcher Terra",
-    "icon": "assets/images/icons/iconexe.ico",
-
+    "icon": "src/assets/images/icons/iconexe.ico",
     "files": [
       "**/*"
     ],
     "directories": {
-      "output": "../",
-      "app": "dist"
+      "output": "dist",
+      "app": "build"
     },
     "win": {
       "target": "nsis",

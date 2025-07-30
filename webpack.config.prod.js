@@ -10,7 +10,7 @@ module.exports = {
   mode: isProduction ? 'production' : 'development',
   entry: './src/scripts/renderer.js',
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'build'),
     filename: 'renderer.bundle.js',
     clean: true
   },
@@ -52,10 +52,10 @@ module.exports = {
       apply: (compiler) => {
         compiler.hooks.afterEmit.tap('CopyMainJs', (compilation) => {
           const mainJsPath = path.resolve(__dirname, 'main.js');
-          const distPath = path.resolve(__dirname, 'dist', 'main.js');
+          const buildPath = path.resolve(__dirname, 'build', 'main.js');
           
           if (fs.existsSync(mainJsPath)) {
-            fs.copyFileSync(mainJsPath, distPath);
+            fs.copyFileSync(mainJsPath, buildPath);
             console.log('✅ main.js copiado sin procesar');
           }
         });
@@ -64,7 +64,7 @@ module.exports = {
     {
       apply: (compiler) => {
         compiler.hooks.afterEmit.tap('CreateDistPackageJson', (compilation) => {
-          const distPackageJson = {
+          const buildPackageJson = {
             name: "Launcher-L2-Terra",
             version: "1.0.0",
             main: "main.js",
@@ -75,7 +75,7 @@ module.exports = {
               productName: "Launcher Terra",
               files: ["**/*"],
               directories: {
-                output: "./"
+                output: "dist"
               },
               win: {
                 target: "nsis",
@@ -83,20 +83,20 @@ module.exports = {
               }
             }
           };
-          const distPath = path.resolve(__dirname, 'dist', 'package.json');
-          fs.writeFileSync(distPath, JSON.stringify(distPackageJson, null, 2));
-          console.log('✅ package.json creado en dist');
+          const buildPath = path.resolve(__dirname, 'build', 'package.json');
+          fs.writeFileSync(buildPath, JSON.stringify(buildPackageJson, null, 2));
+          console.log('✅ package.json creado en build');
           
-          // Copiar electron a dist/node_modules
+          // Copiar electron a build/node_modules
           const electronPath = path.resolve(__dirname, 'node_modules', 'electron');
-          const distElectronPath = path.resolve(__dirname, 'dist', 'node_modules', 'electron');
+          const buildElectronPath = path.resolve(__dirname, 'build', 'node_modules', 'electron');
           if (fs.existsSync(electronPath)) {
-            const distNodeModulesPath = path.resolve(__dirname, 'dist', 'node_modules');
-            if (!fs.existsSync(distNodeModulesPath)) {
-              fs.mkdirSync(distNodeModulesPath, { recursive: true });
+            const buildNodeModulesPath = path.resolve(__dirname, 'build', 'node_modules');
+            if (!fs.existsSync(buildNodeModulesPath)) {
+              fs.mkdirSync(buildNodeModulesPath, { recursive: true });
             }
-            fs.cpSync(electronPath, distElectronPath, { recursive: true });
-            console.log('✅ electron copiado a dist/node_modules');
+            fs.cpSync(electronPath, buildElectronPath, { recursive: true });
+            console.log('✅ electron copiado a build/node_modules');
           }
         });
       }

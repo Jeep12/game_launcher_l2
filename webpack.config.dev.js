@@ -8,9 +8,9 @@ module.exports = {
   mode: 'development',
   entry: './src/scripts/renderer.js',
   output: {
-    path: path.resolve(__dirname, './'),
+    path: path.resolve(__dirname, 'build'),
     filename: 'renderer.bundle.js',
-    clean: false
+    clean: true
   },
   module: {
     rules: [
@@ -45,7 +45,36 @@ module.exports = {
     }),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('development')
-    })
+    }),
+    {
+      apply: (compiler) => {
+        compiler.hooks.afterEmit.tap('CopyMainJs', (compilation) => {
+          const mainJsPath = path.resolve(__dirname, 'main.js');
+          const buildPath = path.resolve(__dirname, 'build', 'main.js');
+          
+          if (fs.existsSync(mainJsPath)) {
+            fs.copyFileSync(mainJsPath, buildPath);
+            console.log('✅ main.js copiado sin procesar');
+          }
+        });
+      }
+    },
+    {
+      apply: (compiler) => {
+        compiler.hooks.afterEmit.tap('CreateBuildPackageJson', (compilation) => {
+          const buildPackageJson = {
+            name: "Launcher-L2-Terra",
+            version: "1.0.0",
+            main: "main.js",
+            description: "Game launcher for Lineage 2 Terra",
+            author: "L2 Terra Team"
+          };
+          const buildPath = path.resolve(__dirname, 'build', 'package.json');
+          fs.writeFileSync(buildPath, JSON.stringify(buildPackageJson, null, 2));
+          console.log('✅ package.json creado en build');
+        });
+      }
+    }
   ],
   resolve: {
     extensions: ['.js', '.json'],

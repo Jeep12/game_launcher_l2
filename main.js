@@ -40,12 +40,8 @@ let splash;
 
 const isDev = !app.isPackaged;
 function resolveAssetPath(...segments) {
-  if (isDev) {
-    return path.join(__dirname, ...segments);
-  } else {
-    // En producción, los archivos están en la raíz del asar
-    return path.join(__dirname, ...segments);
-  }
+  // En desarrollo y producción, los archivos están en la misma carpeta que main.js
+  return path.join(__dirname, ...segments);
 }
 
 // 🧱 Ventana de error personalizada
@@ -737,7 +733,7 @@ function createWindow() {
     }
   });
 
-//   mainWindow.webContents.openDevTools(); // Comentado para no abrir la consola automáticamente
+   mainWindow.webContents.openDevTools(); // Comentado para no abrir la consola automáticamente
 }
 
 app.whenReady().then(createWindow);
