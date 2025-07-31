@@ -12,14 +12,15 @@
     "dist:inno": "npm run build:prod && iscc installer.iss",
     "dist:packager": "npm run build:prod && electron-packager build Launcher-Terra --platform=win32 --arch=x64 --out=../ --overwrite",
     "dist:packager-nsis": "npm run dist:packager && makensis ../custom-installer.nsi",
+
     "clean": "rimraf build && rimraf dist && rimraf temp && rimraf renderer.bundle.js && rimraf styles.css && rimraf assets && rimraf views && rimraf preload.js",
     "clean:dev": "rimraf *.ttf *.woff *.woff2 *.png *.webp *.map",
     "clean:all": "npm run clean && npm run clean:dev"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["l2", "lineage2", "game", "launcher", "terra"],
+  "author": "L2 Terra Team",
   "license": "ISC",
-  "description": "Aplicación PWA en Electron",
+  "description": "Game launcher for Lineage 2 Terra",
   "devDependencies": {
     "@babel/core": "^7.28.0",
     "@babel/preset-env": "^7.28.0",
@@ -58,19 +59,20 @@
     "vm-browserify": "^1.1.2"
   },
   "build": {
-    "appId": "L2Terra",
+    "appId": "com.l2terra.launcher",
     "productName": "Launcher Terra",
-    "icon": "src/assets/images/icons/iconexe.ico",
+    "icon": "src/assets/images/icons/terra_icon.ico",
+    "publisher": "L2 Terra Team",
+    "win": {
+      "target": "nsis",
+      "requestedExecutionLevel": "requireAdministrator"
+    },
     "files": [
       "**/*"
     ],
     "directories": {
       "output": "dist",
       "app": "build"
-    },
-    "win": {
-      "target": "nsis",
-      "requestedExecutionLevel": "requireAdministrator"
     }
   }
 }

@@ -1,6 +1,12 @@
 # 🎮 Launcher L2 Terra
 
-Un launcher moderno y elegante para Lineage 2 Terra con funcionalidades avanzadas de descarga automática, rankings en tiempo real y gestión inteligente de archivos.
+Este launcher fue creado especialmente para el servidor privado Lineage 2 Terra.
+<br>
+<a href="https://l2terra.online" target="_blank" >https://l2terra.online</a>
+<br>
+Permite mantener el cliente siempre actualizado automáticamente con los últimos parches.Tambien muestra 2 tablas de rankings.
+
+<img width="925" height="605" alt="image" src="https://github.com/user-attachments/assets/ffa70f5f-3b2a-42db-8459-0698f7644b1d" />
 
 ## 🚀 Comandos
 
@@ -27,8 +33,7 @@ npm run dist:inno          # Crear instalador Inno Setup
 - [📊 Sistema de Rankings](#-sistema-de-rankings)
 - [🔧 Configuración del Entorno](#-configuración-del-entorno)
 - [📦 Instaladores](#-instaladores)
-- [🐛 Solución de Problemas](#-solución-de-problemas)
-- [🤝 Contribución](#-contribución)
+
 
 ## 🎯 Características Principales
 
@@ -41,10 +46,9 @@ npm run dist:inno          # Crear instalador Inno Setup
 - **Interfaz moderna**: Diseño elegante con animaciones y efectos visuales
 
 ### 📊 Sistema de Progreso
-- **Barra de progreso de descarga**: Muestra progreso por archivo
-- **Barra de progreso de extracción**: Muestra progreso de extracción
-- **Progreso total**: Barra principal con progreso general
-- **Información detallada**: Nombre del archivo, porcentaje y estado
+- **Barra de progreso principal**: Muestra progreso general del proceso
+- **Información detallada**: Nombre del archivo, porcentaje y estado actual
+- **Gestión inteligente**: Maneja descarga e instalación en una sola barra
 
 ## 📁 Estructura del Proyecto
 
@@ -262,64 +266,5 @@ npm run dist:inno
 - Ubicación: `../Launcher-Terra-Inno-Setup.exe`
 
 
-## 🐛 Solución de Problemas
-
-### Errores Comunes
-
-#### ❌ Error: `ERR_FILE_NOT_FOUND`
-**Causa**: Archivos no encontrados en desarrollo
-**Solución**:
-```bash
-npm run clean
-npm start
-```
-
-#### ❌ Error: `Unable to load preload script`
-**Causa**: `main.js` no encuentra archivos
-**Solución**:
-```bash
-npm run clean
-npm start
-```
-
-#### ❌ Error: `EBUSY: resource busy or locked`
-**Causa**: Proceso de Electron aún ejecutándose
-**Solución**:
-```bash
-taskkill /f /im "Launcher-Terra.exe"
-taskkill /f /im "electron.exe"
-npm run clean
-```
-
-### Debugging
-
-```bash
-# Ver logs en tiempo real
-npm start
-# Abrir DevTools (F12) para ver logs detallados
-```
-
-Los logs de producción se pueden encontrar en:
-- **Windows**: `%APPDATA%\Launcher-L2-Terra\logs\`
-- **Consola**: Abrir DevTools en la aplicación instalada
-
-## 🤝 Contribución
-
-### Flujo de Desarrollo
-
-1. **Fork del proyecto**
-2. **Crear rama feature**: `git checkout -b feature/nueva-funcionalidad`
-3. **Desarrollar**: Hacer cambios y commits
-4. **Probar**: `npm start` y `npm run dist`
-5. **Pull Request**: Enviar cambios para revisión
-
-### Estándares de Código
-
-- **JavaScript**: ES6+ con módulos
-- **CSS**: Estilos modulares
-- **HTML**: Semántico y accesible
-- **Commits**: Mensajes descriptivos en español
-
----
 
 **Desarrollado con ❤️ para la comunidad de Lineage 2 Terra**

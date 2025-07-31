@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, Menu } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu, nativeImage } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { spawn, exec } = require('child_process');
@@ -78,7 +78,8 @@ function createWindow() {
     alwaysOnTop: true,
     resizable: false,
     backgroundColor: '#212121',
-    icon: resolveAssetPath('assets', 'images', 'icons', 'TCOLORICO.ico'),
+    icon: resolveAssetPath('assets', 'images', 'icons', 'terra_icon.ico'),
+    skipTaskbar: true,
   });
 
   splash.loadFile(resolveAssetPath('splash.html'));
@@ -92,7 +93,10 @@ function createWindow() {
     backgroundColor: '#212121',
     fullscreenable: false,
     maximizable: false,
-    icon: resolveAssetPath('assets', 'images', 'icons', 'TCOLORICO.ico'),
+    icon: resolveAssetPath('assets', 'images', 'icons', 'terra_icon.ico'),
+    title: 'Launcher Terra',
+    skipTaskbar: false,
+    showInTaskbar: true,
     webPreferences: {
       preload: resolveAssetPath('preload.js'),
       nodeIntegration: false,
@@ -107,6 +111,8 @@ function createWindow() {
     setTimeout(() => {
       splash.destroy();
       mainWindow.show();
+      // Asegurar que el ícono se muestre en la barra de tareas
+      mainWindow.setIcon(resolveAssetPath('assets', 'images', 'icons', 'terra_icon.ico'));
     }, 2000);
   });
 
@@ -733,10 +739,23 @@ function createWindow() {
     }
   });
 
-   mainWindow.webContents.openDevTools(); // Comentado para no abrir la consola automáticamente
+   // Abrir DevTools solo en desarrollo
+   if (isDev) {
+     mainWindow.webContents.openDevTools();
+   }
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  // Configurar el ícono de la aplicación
+  const iconPath = resolveAssetPath('assets', 'images', 'icons', 'terra_icon.ico');
+  if (fs.existsSync(iconPath)) {
+    const icon = nativeImage.createFromPath(iconPath);
+    if (process.platform === 'darwin') {
+      app.dock.setIcon(icon); // Para macOS
+    }
+  }
+  createWindow();
+});
 
 // 💀 Matamos todos los L2.exe al cerrar
 app.on('before-quit', () => {

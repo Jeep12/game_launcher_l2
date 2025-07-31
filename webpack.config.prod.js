@@ -39,7 +39,8 @@ module.exports = {
         { from: 'src/views', to: 'views' },
         { from: 'src/preload.js', to: 'preload.js' },
         { from: 'index.html', to: 'index.html' },
-        { from: 'splash.html', to: 'splash.html' }
+        { from: 'splash.html', to: 'splash.html' },
+        { from: 'src/assets/images/icons/terra_icon.ico', to: 'assets/images/icons/terra_icon.ico' }
       ]
     }),
     new MiniCssExtractPlugin({
@@ -73,6 +74,7 @@ module.exports = {
             build: {
               appId: "L2Terra",
               productName: "Launcher Terra",
+              icon: "assets/images/icons/terra_icon.ico",
               files: ["**/*"],
               directories: {
                 output: "dist"

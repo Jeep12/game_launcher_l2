@@ -22,8 +22,11 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={userappdata}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputDir=..\
-OutputBaseFilename=Launcher-Terra-Inno-Setup
-SetupIconFile=src\assets\images\icons\iconexe2.ico
+OutputBaseFilename=Launcher Terra Installer
+SetupIconFile=src\assets\images\icons\terra_icon.ico
+;AppIconFile=src\assets\images\icons\terra_icon.ico
+WizardImageFile=src\assets\images\wizard\WizardImage.bmp
+WizardSmallImageFile=src\assets\images\wizard\WizardSmallImage.bmp
 Compression=lzma
 SolidCompression=yes
 PrivilegesRequired=admin
@@ -39,26 +42,26 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 ; Archivo principal
-Source: "dist\win-unpacked\Launcher Terra.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\resources.pak"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\chrome_100_percent.pak"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\chrome_200_percent.pak"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\icudtl.dat"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\libEGL.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\libGLESv2.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\LICENSE.electron.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\LICENSES.chromium.html"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\snapshot_blob.bin"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\v8_context_snapshot.bin"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\vk_swiftshader.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\vk_swiftshader_icd.json"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\vulkan-1.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\ffmpeg.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "dist\win-unpacked\d3dcompiler_47.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\Launcher Terra.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\resources.pak"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\chrome_100_percent.pak"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\chrome_200_percent.pak"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\icudtl.dat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\libEGL.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\libGLESv2.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\LICENSE.electron.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\LICENSES.chromium.html"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\snapshot_blob.bin"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\v8_context_snapshot.bin"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\vk_swiftshader.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\vk_swiftshader_icd.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\vulkan-1.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\ffmpeg.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\dist\win-unpacked\d3dcompiler_47.dll"; DestDir: "{app}"; Flags: ignoreversion
 
 ; Recursos de la aplicación
-Source: "dist\win-unpacked\resources\*"; DestDir: "{app}\resources"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "dist\win-unpacked\locales\*"; DestDir: "{app}\locales"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "build\dist\win-unpacked\resources\*"; DestDir: "{app}\resources"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "build\dist\win-unpacked\locales\*"; DestDir: "{app}\locales"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Code]
 function InitializeSetup(): Boolean;
