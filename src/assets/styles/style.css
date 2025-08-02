@@ -36,7 +36,8 @@ body::before {
   width: 100%;
   background: url('../images/backgrounds/baium.png') no-repeat center center fixed;
   background-size: cover;
-  transform: scaleX(-1); /* 🔄 espejar horizontalmente */
+  transform: scaleX(-1);
+  /* 🔄 espejar horizontalmente */
   z-index: -1;
 }
 
@@ -77,6 +78,7 @@ body::before {
   position: relative;
   box-shadow: -20px 20px 30px black;
 }
+
 .titlebar-center::before {
   content: '';
   position: absolute;
@@ -279,8 +281,10 @@ body::before {
   flex: 1;
   overflow-y: auto;
   /* Ocultar scrollbars */
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* Internet Explorer 10+ */
 }
 
 /* Ocultar scrollbar para WebKit browsers (Chrome, Safari, Edge) */
@@ -330,19 +334,27 @@ body::before {
   gap: 15px;
   align-items: center;
   justify-content: space-between;
+  position: relative;
+  z-index: 1000;
+  margin-top: -20px;
 }
 
 /* Progress Bars Section (70% width) */
 .progress-section {
   width: 70%;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  justify-content: center;
+  flex-direction: row;
+  gap: 15px;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 1001;
 }
 
 .folder-section {
-  margin-bottom: 10px;
+  margin-bottom: 5px;
+  position: relative;
+  z-index: 1002;
 }
 
 .folder-display {
@@ -350,86 +362,189 @@ body::before {
   font-size: 12px;
   font-weight: bold;
   text-shadow: 0 0 5px rgba(218, 190, 100, 0.5);
-}
-
-.progress-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   margin-bottom: 5px;
+  position: relative;
+  z-index: 1003;
 }
 
-.progress-label {
-  color: #dabe64;
-  font-weight: bold;
-  font-size: 14px;
-  min-width: 80px;
+/* Progress Bar Styles - Professional Launcher */
+.progress-container {
+  flex: 1;
+  margin: 5px 0;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1004;
 }
 
 .progress-bar {
-  flex: 1;
-  height: 20px;
-  background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 0;
+  position: relative;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
   overflow: hidden;
-  border: 2px solid #dabe64;
+  border: 2px solid rgba(218, 190, 100, 0.3);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  z-index: 1005;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #dabe64, #f0d080);
-  transition: width 0.3s ease;
-  border-radius: 0;
+  background: linear-gradient(90deg, #dabe64, #f4d03f, #dabe64);
+  border-radius: 10px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 0%;
+  position: relative;
+  box-shadow: 0 0 10px rgba(218, 190, 100, 0.5);
+  z-index: 1006;
 }
 
-.progress-percentage {
-  color: #dabe64;
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  z-index: 1007;
+}
+
+.progress-percent {
+  color: #ffffff;
   font-weight: bold;
   font-size: 14px;
-  min-width: 40px;
-  text-align: right;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
 }
 
 .progress-status {
   color: #ffffff;
+  font-weight: bold;
   font-size: 12px;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Progress Details Styles */
+.progress-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  border: 1px solid rgba(218, 190, 100, 0.2);
+  position: relative;
+  z-index: 1008;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.progress-time,
+.progress-speed {
+  color: #dabe64;
+  font-size: 11px;
+  font-weight: bold;
+  text-shadow: 0 0 3px rgba(218, 190, 100, 0.5);
+}
+
+.progress-file {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.current-file {
+  color: #ffffff;
+  font-size: 11px;
   font-style: italic;
-  margin-bottom: 10px;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Download Progress Specific */
+#downloadProgressFill {
+  background: linear-gradient(90deg, #3498db, #5dade2);
+}
+
+/* Installation Progress Specific */
+#installProgressFill {
+  background: linear-gradient(90deg, #27ae60, #58d68d);
+}
+
+/* Disabled state for download progress */
+.progress-container.download-disabled .progress-fill {
+  background: rgba(128, 128, 128, 0.3);
+}
+
+.progress-container.download-disabled .progress-status {
+  color: #888;
 }
 
 /* Play Button Section (30% width) */
 .button-section {
-  width: 30%;
+  width: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 10px;
+  background-color: red;
+  position: relative;
+  z-index: 1009;
 }
 
 .button-group {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1010;
 }
 
 .btn-play {
   color: #ffffff;
-  text-decoration: none;
-  font-size: 16px;
-  position: relative;
+  position: absolute;
+  top: -17px;
+  right: -200px;
+  height: 80px;
+  width: 200px;
   background: linear-gradient(135deg, #dabe64, #b8941f);
-  padding: 12px 25px;
-  text-transform: uppercase;
-  margin: 0 8px;
-  font-weight: bold;
-  font-family: "l2font", 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  clip-path: polygon(15px 0, 100% 0, calc(100% - 15px) 100%, 0 100%);
-  overflow: hidden;
   border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 120px;
+  clip-path: polygon(15px 0, 100% 0, calc(100% - 15px) 100%, 0 100%);
+
+
 }
 
 .btn-play:hover:not(:disabled) {
@@ -457,7 +572,7 @@ body::before {
 .nk-page-border .nk-page-border-b,
 .nk-page-border .nk-page-border-l {
   position: fixed;
-  z-index: 2000;
+  z-index: 500;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -468,7 +583,7 @@ body::before {
 }
 
 .nk-page-border .nk-page-border-t {
-  z-index: 1500;
+  z-index: 500;
 }
 
 .nk-page-border .nk-page-border-t,

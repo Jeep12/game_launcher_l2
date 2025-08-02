@@ -1,38 +1,71 @@
-// gameLauncher.js
+// gameLauncher.js - Sistema principal actualizado
+import { environment } from '../environments/enviroment.js';
+import { logger } from './logger.js';
+import { fileValidator } from './fileValidator.js';
+import { retryManager } from './retryManager.js';
+import { repairService } from './repairService.js';
+import { timerManager } from './timerManager.js';
+import RankingService from './rankingService.js';
 import PatchDownloader from './patchDownloader.js';
-import { Installer } from './installer.js';
 
 class GameLauncher {
   constructor() {
-    this.patchDownloader = new PatchDownloader();
-    this.installer = new Installer();
     this.isDownloading = false;
-    this.isInstalling = false;
-    this.currentDownload = null;
+    this.isRepairing = false;
+    this.isClientReady = false;
     this.downloadStats = {
       totalFiles: 0,
       completedFiles: 0,
       currentFile: null,
       currentProgress: 0
     };
-    this.isClientReady = false;
+    
+    // Inicializar servicios
+    this.patchDownloader = null;
+    this.rankingService = new RankingService();
   }
 
-  // Toast notification function
+  async initialize() {
+    try {
+      logger.info('Initializing GameLauncher systems');
+      
+      // Inicializar patch downloader
+      this.patchDownloader = new PatchDownloader();
+      await this.patchDownloader.initialize();
+      
+      // Inicializar repair service
+      logger.info('Initializing repair service');
+      await repairService.initialize(this.patchDownloader);
+      
+      logger.info('GameLauncher initialized successfully');
+    } catch (error) {
+      logger.error('Failed to initialize GameLauncher', { error: error.message });
+      throw error;
+    }
+  }
+
   showToast(message, type = 'info', duration = 3000) {
-    const toast = document.getElementById('toast');
-    const toastMessage = toast.querySelector('.toast-message');
-    
-    // Set message and type
-    toastMessage.textContent = message;
+    const toast = document.createElement('div');
     toast.className = `toast ${type}`;
+    toast.innerHTML = `
+      <div class="toast-content">
+        <span class="toast-message">${message}</span>
+      </div>
+    `;
     
-    // Show toast
-    toast.classList.add('show');
+    document.body.appendChild(toast);
     
-    // Hide toast after duration
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 100);
+    
     setTimeout(() => {
       toast.classList.remove('show');
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 300);
     }, duration);
   }
 
@@ -40,492 +73,624 @@ class GameLauncher {
     const btnUpdate = document.getElementById('btnUpdate');
     const btnPlay = document.getElementById('btnPlay');
     const btnRepair = document.getElementById('btnRepair');
-    const btnSelectFolder = document.getElementById('btnSelectFolder');
+    
+    // Progress elements
     const progressFill = document.getElementById('progressFill');
     const progressPercent = document.getElementById('progressPercent');
     const progressStatus = document.getElementById('progressStatus');
+    const progressDetails = document.getElementById('progressDetails');
+    
     const folderPath = document.getElementById('folderPath');
-    
-    // Verificar que todos los elementos estén presentes
-    const requiredElements = {
-      btnUpdate, btnPlay, btnRepair, btnSelectFolder,
-      progressFill, progressPercent, progressStatus,
-      folderPath
-    };
-    
-    const missingElements = Object.entries(requiredElements)
-      .filter(([name, element]) => !element)
-      .map(([name]) => name);
-    
-    if (missingElements.length > 0) {
-      console.error('Elementos del DOM no encontrados:', missingElements);
+
+    if (!btnUpdate || !btnPlay || !btnRepair || !progressFill || !progressPercent || 
+        !progressStatus || !folderPath) {
+      logger.error('Required DOM elements not found', {
+        btnUpdate: !!btnUpdate,
+        btnPlay: !!btnPlay,
+        btnRepair: !!btnRepair,
+        progressFill: !!progressFill,
+        progressPercent: !!progressPercent,
+        progressStatus: !!progressStatus,
+        folderPath: !!folderPath
+      });
       return;
     }
-    
-    console.log('All DOM elements found correctly');
 
-    // Configure update button
-    btnUpdate.addEventListener('click', () => {
-      console.log('=== Update button clicked ===');
-      if (this.isDownloading) {
-        console.log('Already downloading, ignoring click');
-        return; // Avoid multiple downloads
+    logger.info('All DOM elements found correctly');
+
+    // Configurar botón de actualización
+    btnUpdate.addEventListener('click', async () => {
+      if (this.isDownloading || this.isRepairing) {
+        logger.warn('Operation already in progress, ignoring click');
+        return;
       }
-
-      console.log('Starting update...');
-      this.startUpdate(progressFill, progressPercent, progressStatus, btnUpdate, btnPlay);
-    });
-
-    // Configure play button
-    btnPlay.addEventListener('click', () => {
+      
       const selectedFolder = localStorage.getItem('selectedFolder');
-      if (selectedFolder) {
-        if (window.electron) {
-          window.electron.launchGame(selectedFolder);
-        } else {
-          this.showToast('Electron is not available.', 'error');
-        }
-      } else {
-        this.showToast('You must select a folder before playing.', 'error');
+      if (!selectedFolder) {
+        this.showToast('Please select a folder first', 'warning');
+        return;
+      }
+      
+      await this.startUpdate(progressFill, progressPercent, progressStatus, progressDetails, btnUpdate, btnPlay);
+    });
+
+    // Configurar botón de reparación
+    btnRepair.addEventListener('click', async () => {
+      if (this.isDownloading || this.isRepairing) {
+        logger.warn('Operation already in progress, ignoring click');
+        return;
+      }
+      
+      const selectedFolder = localStorage.getItem('selectedFolder');
+      if (!selectedFolder) {
+        this.showToast('Please select a folder first', 'warning');
+        return;
+      }
+      
+      await this.startRepair(progressFill, progressPercent, progressStatus, progressDetails, btnRepair);
+    });
+
+    // Configurar botón de juego
+    btnPlay.addEventListener('click', () => {
+      if (this.isDownloading || this.isRepairing) {
+        logger.warn('Operation in progress, cannot launch game');
+        this.showToast('Please wait for current operation to complete', 'warning');
+        return;
+      }
+      
+      const selectedFolder = localStorage.getItem('selectedFolder');
+      if (!selectedFolder) {
+        this.showToast('Please select a folder first', 'warning');
+        return;
+      }
+      
+      if (window.electron) {
+        window.electron.launchGame(selectedFolder);
       }
     });
 
-    // Configure repair button
-    btnRepair.addEventListener('click', () => {
-      this.startRepair(progressFill, progressPercent, progressStatus, btnRepair);
-    });
-
-
-
-    // Verificar estado inicial
+    // Verificar estado inicial del cliente
     this.checkClientStatus();
   }
 
   async checkClientStatus() {
-    const selectedFolder = localStorage.getItem('selectedFolder');
-    const progressFill = document.getElementById('progressFill');
-    const progressPercent = document.getElementById('progressPercent');
-    const progressStatus = document.getElementById('progressStatus');
-    const btnPlay = document.getElementById('btnPlay');
-
-    if (!selectedFolder) {
-      progressFill.style.width = '0%';
-      progressPercent.textContent = '0%';
-      progressStatus.textContent = 'Select a folder to start';
-      btnPlay.disabled = true;
-      return;
-    }
-
     try {
-      progressStatus.textContent = 'Checking client status...';
+      const selectedFolder = localStorage.getItem('selectedFolder');
+      if (!selectedFolder) return;
+
+      logger.info('Checking client status', { folder: selectedFolder });
       
-      // Initialize downloader
-      await this.patchDownloader.initialize();
-      
-      // Get server files
-      const serverFiles = await this.patchDownloader.getAvailableFiles();
-      const localFiles = await this.patchDownloader.getLocalFiles(selectedFolder);
-      const filesToUpdate = await this.patchDownloader.getFilesToUpdate(serverFiles, localFiles);
-      
-      if (filesToUpdate.length === 0) {
-        // Everything is updated
-        progressFill.style.width = '100%';
-        progressPercent.textContent = '100%';
-        progressStatus.textContent = 'Client updated ✓';
-        btnPlay.disabled = false;
-        this.isClientReady = true;
+      const isValid = await fileValidator.validateDirectory(selectedFolder);
+      if (isValid) {
+        const files = await this.patchDownloader.getLocalFiles(selectedFolder);
+        this.isClientReady = files.length > 0;
+        logger.info('Client status: Ready', { fileCount: files.length });
+        
+        // Verificar actualizaciones automáticamente
+        await this.checkForUpdates();
       } else {
-        // Files need updating
-        const percentage = Math.round(((serverFiles.length - filesToUpdate.length) / serverFiles.length) * 100);
-        progressFill.style.width = `${percentage}%`;
-        progressPercent.textContent = `${percentage}%`;
-        progressStatus.textContent = `${filesToUpdate.length} file(s) need updating`;
-        btnPlay.disabled = true;
         this.isClientReady = false;
+        logger.warn('Client status: Not ready - invalid directory');
       }
-      
     } catch (error) {
-      console.error('Error checking client status:', error);
-      progressStatus.textContent = 'Error checking client status';
-      btnPlay.disabled = true;
+      logger.error('Error checking client status', { error: error.message });
+      this.isClientReady = false;
     }
   }
 
-  async startUpdate(progressFill, progressPercent, progressStatus, btnUpdate, btnPlay) {
-    console.log('=== startUpdate method started ===');
+  // Verificar actualizaciones automáticamente
+  async checkForUpdates() {
     try {
-      // Check if folder is selected
       const selectedFolder = localStorage.getItem('selectedFolder');
-      console.log('Selected folder:', selectedFolder);
-      if (!selectedFolder) {
-        console.log('No folder selected');
-        this.showToast('You must select a folder before updating.', 'error');
+      if (!selectedFolder) return;
+
+      logger.info('Checking for updates automatically');
+
+      // Obtener elementos de la UI
+      const progressFill = document.getElementById('progressFill');
+      const progressPercent = document.getElementById('progressPercent');
+      const progressStatus = document.getElementById('progressStatus');
+      const progressDetails = document.getElementById('progressDetails');
+      
+      if (!progressFill || !progressPercent || !progressStatus) {
+        logger.warn('Progress elements not found for auto-update check');
         return;
       }
 
-      this.isDownloading = true;
-      btnUpdate.disabled = true;
-      
-      progressStatus.textContent = 'Checking for updates...';
-      progressFill.style.width = '0%';
-      progressPercent.textContent = '0%';
+      // Actualizar la carpeta actual en el patchDownloader
+      this.patchDownloader.updateCurrentFolder(selectedFolder);
 
-      // Initialize downloader
-      await this.patchDownloader.initialize();
-      
-      progressStatus.textContent = 'Checking available files...';
+      // Obtener archivos del servidor
+      const serverFiles = await retryManager.retryApiCall(
+        () => this.patchDownloader.getAvailableFiles(),
+        'get_available_files_auto'
+      );
 
-      // Check if updates are needed
-      console.log('=== Checking for updates ===');
-      const serverFiles = await this.patchDownloader.getAvailableFiles();
-      console.log('Server files:', serverFiles);
-      
+      // Obtener archivos locales
       const localFiles = await this.patchDownloader.getLocalFiles(selectedFolder);
-      console.log('Local files:', localFiles);
-      
+
+      // Obtener archivos que necesitan actualización
       const filesToUpdate = await this.patchDownloader.getFilesToUpdate(serverFiles, localFiles);
-      console.log('Files to update:', filesToUpdate);
-      console.log('Files to update length:', filesToUpdate.length);
 
       if (filesToUpdate.length === 0) {
-        // No updates needed
-        console.log('=== No updates needed ===');
-        progressStatus.textContent = 'Game is already up to date ✓';
+        // No hay actualizaciones necesarias - mostrar 100%
+        logger.info('No updates needed, client is up to date');
+        
+        // Mostrar 100% en la barra
         progressFill.style.width = '100%';
         progressPercent.textContent = '100%';
-        btnUpdate.disabled = false;
-        this.isDownloading = false;
+        progressStatus.textContent = 'Client is up to date ✓';
         
-        // Show toast notification
-        this.showToast('Game is already up to date!', 'success');
+        // Ocultar detalles del progreso cuando no hay descarga
+        progressDetails.style.display = 'none';
+        
+        this.showToast('Client is up to date ✓', 'success');
+      } else {
+        // Hay actualizaciones disponibles - mostrar 0%
+        logger.info(`Updates available: ${filesToUpdate.length} files need update`);
+        
+        // Mostrar 0% en la barra
+        progressFill.style.width = '0%';
+        progressPercent.textContent = '0%';
+        progressStatus.textContent = `${filesToUpdate.length} files to download`;
+        
+        // Mostrar detalles del progreso solo cuando hay actualizaciones
+        progressDetails.style.display = 'block';
+        
+        this.showToast(`${filesToUpdate.length} updates available`, 'info');
+      }
+    } catch (error) {
+      logger.error('Error checking for updates', { error: error.message });
+      // En caso de error, mostrar estado neutral
+      const progressFill = document.getElementById('progressFill');
+      const progressPercent = document.getElementById('progressPercent');
+      const progressStatus = document.getElementById('progressStatus');
+      
+      if (progressFill && progressPercent && progressStatus) {
+        progressFill.style.width = '0%';
+        progressPercent.textContent = '0%';
+        progressStatus.textContent = 'Check for updates';
+      }
+    }
+  }
+
+  // Resetear barra de progreso
+  resetProgressBar(progressFill, progressPercent, progressStatus, message = 'Ready') {
+    if (progressFill) progressFill.style.width = '0%';
+    if (progressPercent) progressPercent.textContent = '0%';
+    if (progressStatus) progressStatus.textContent = message;
+    
+    // Resetear detalles del progreso
+    this.resetProgressDetails();
+    
+    // Ocultar detalles del progreso al resetear
+    const progressDetails = document.getElementById('progressDetails');
+    if (progressDetails) progressDetails.style.display = 'none';
+  }
+
+  async startUpdate(progressFill, progressPercent, progressStatus, progressDetails, btnUpdate, btnPlay) {
+    try {
+      this.isDownloading = true;
+      btnUpdate.disabled = true;
+      btnPlay.disabled = false;
+
+      const selectedFolder = localStorage.getItem('selectedFolder');
+      if (!selectedFolder) {
+        throw new Error('No folder selected');
+      }
+
+      logger.info('Starting update process', { folder: selectedFolder });
+
+      // Resetear barra de progreso y mostrar progreso inmediatamente
+      this.resetProgressBar(progressFill, progressPercent, progressStatus, 'Starting update...');
+      
+      // Asegurar que la barra esté visible y en 0%
+      progressFill.style.width = '0%';
+      progressPercent.textContent = '0%';
+      progressDetails.style.display = 'block';
+
+      // Actualizar la carpeta actual en el patchDownloader
+      this.patchDownloader.updateCurrentFolder(selectedFolder);
+
+      // Inicializar temporizador inmediatamente
+      const timerId = `update_${Date.now()}`;
+      timerManager.startTimer(timerId, 'download', 0, (timerInfo) => {
+        // Actualizar información detallada en tiempo real
+        this.updateProgressDetails(timerId, timerInfo.progress || 0, 'download');
+      });
+
+      // Mostrar progreso inicial
+      progressStatus.textContent = 'Checking for updates...';
+      progressFill.style.width = '5%';
+      progressPercent.textContent = '5%';
+
+      // Obtener archivos del servidor con reintentos
+      progressStatus.textContent = 'Connecting to server...';
+      progressFill.style.width = '10%';
+      progressPercent.textContent = '10%';
+      
+      const serverFiles = await retryManager.retryApiCall(
+        () => this.patchDownloader.getAvailableFiles(),
+        'get_available_files'
+      );
+
+      // Mostrar progreso de análisis
+      progressStatus.textContent = 'Analyzing files...';
+      progressFill.style.width = '20%';
+      progressPercent.textContent = '20%';
+
+      // Obtener archivos locales
+      const localFiles = await this.patchDownloader.getLocalFiles(selectedFolder);
+
+      // Obtener archivos que necesitan actualización
+      progressStatus.textContent = 'Comparing files...';
+      progressFill.style.width = '30%';
+      progressPercent.textContent = '30%';
+      
+      const filesToUpdate = await this.patchDownloader.getFilesToUpdate(serverFiles, localFiles);
+
+      if (filesToUpdate.length === 0) {
+        logger.info('No files need update');
+        progressFill.style.width = '100%';
+        progressPercent.textContent = '100%';
+        progressStatus.textContent = 'All files are up to date ✓';
+        
+        // Ocultar detalles del progreso cuando no hay descarga
+        progressDetails.style.display = 'none';
+        
+        this.showToast('All files are up to date ✓', 'success');
         return;
       }
 
-      // Start download and extraction process
-      this.patchDownloader.downloadAndExtractAllFiles(
+      logger.info(`Found ${filesToUpdate.length} files to update`);
+
+      // Mostrar progreso de preparación
+      progressStatus.textContent = `Preparing to download ${filesToUpdate.length} files...`;
+      progressFill.style.width = '40%';
+      progressPercent.textContent = '40%';
+
+      // Actualizar progreso total
+      this.downloadStats = {
+        totalFiles: filesToUpdate.length,
+        completedFiles: 0,
+        currentFile: null,
+        currentProgress: 0
+      };
+
+      // Usar el método real de descarga y extracción del patchDownloader
+      await this.patchDownloader.downloadAndExtractAllFiles(
         selectedFolder,
-        // Download progress callback
         (filename, downloaded, total, percent) => {
-          progressStatus.textContent = `Downloading: ${filename}`;
-          progressFill.style.width = `${percent}%`;
-          progressPercent.textContent = `${percent}%`;
+          // Callback de descarga - actualizar barra de progreso
+          this.downloadStats.currentFile = filename;
+          this.downloadStats.currentProgress = percent;
+          
+          // Calcular progreso total de descarga (40% a 90%)
+          if (this.downloadStats.totalFiles > 0) {
+            const downloadProgress = (this.downloadStats.completedFiles / this.downloadStats.totalFiles) * 50; // 50% para descarga
+            const currentFileProgress = (percent / 100) * (50 / this.downloadStats.totalFiles); // 50% dividido entre archivos
+            const totalProgress = Math.min(40 + downloadProgress + currentFileProgress, 90);
+            
+            // Actualizar UI para descarga
+            if (!isNaN(totalProgress)) {
+              progressFill.style.width = `${totalProgress}%`;
+              progressPercent.textContent = `${Math.round(totalProgress)}%`;
+              progressStatus.textContent = `Downloading ${filename}... ${Math.round(percent)}%`;
+              
+              // Log para debuggear
+              logger.debug('Download progress update', {
+                filename,
+                percent,
+                totalProgress,
+                downloadProgress,
+                currentFileProgress,
+                completedFiles: this.downloadStats.completedFiles,
+                totalFiles: this.downloadStats.totalFiles,
+                downloaded,
+                total
+              });
+              
+              // Actualizar información detallada para descarga
+              this.updateProgressDetails(timerId, totalProgress, 'download', filename);
+              
+              // Pasar bytes descargados para cálculo de velocidad real
+              timerManager.updateProgress(timerId, totalProgress, total, downloaded);
+            }
+          }
         },
-        // Extraction progress callback
-        (filename, percent) => {
-          progressStatus.textContent = `Installing: ${filename}`;
-          progressFill.style.width = `${percent}%`;
-          progressPercent.textContent = `${percent}%`;
+        (filename, progress) => {
+          // Callback de extracción - actualizar barra de progreso (90% a 100%)
+          const extractionProgress = 90 + (progress * 0.1); // 10% para extracción
+          
+          // Actualizar UI para extracción
+          progressFill.style.width = `${extractionProgress}%`;
+          progressPercent.textContent = `${Math.round(extractionProgress)}%`;
+          progressStatus.textContent = `Installing ${filename}... ${Math.round(progress)}%`;
+          
+          // Actualizar información detallada para instalación
+          this.updateProgressDetails(timerId, extractionProgress, 'extraction', filename);
+          
+          // Para extracción, usamos el progreso como bytes procesados (aproximado)
+          const processedBytes = Math.floor(progress * 1024 * 1024); // Aproximación: 1MB por 100%
+          timerManager.updateProgress(timerId, extractionProgress, 1024 * 1024, processedBytes);
         },
-        // File completed callback
-        (filename, completed, total) => {
-          const totalProgress = Math.round((completed / total) * 100);
-          progressFill.style.width = `${totalProgress}%`;
-          progressPercent.textContent = `${totalProgress}%`;
-          progressStatus.textContent = `Processing files... ${completed}/${total} (${totalProgress}%)`;
+        (filename) => {
+          // Archivo completado
+          this.downloadStats.completedFiles++;
+          this.downloadStats.currentFile = filename;
+          logger.info(`File completed: ${filename}`);
+          
+          // Calcular progreso total para descarga
+          const downloadProgress = 40 + (this.downloadStats.completedFiles / this.downloadStats.totalFiles) * 50;
+          
+          // Actualizar barra de progreso
+          progressFill.style.width = `${downloadProgress}%`;
+          progressPercent.textContent = `${Math.round(downloadProgress)}%`;
+          progressStatus.textContent = `Downloaded: ${filename}`;
+          
+          // Actualizar información detallada para descarga
+          this.updateProgressDetails(timerId, downloadProgress, 'download', filename);
         },
-        // Completed callback
         (summary) => {
-          progressStatus.textContent = 'Update completed ✓';
+          // Descarga completada
+          logger.info('Download completed', { summary });
+          
+          // Asegurar que llegue al 100%
           progressFill.style.width = '100%';
           progressPercent.textContent = '100%';
-          btnPlay.disabled = false;
-          this.isClientReady = true;
+          progressStatus.textContent = 'Update completed ✓';
           
-          btnUpdate.disabled = false;
-          this.isDownloading = false;
+          // Actualizar información detallada con progreso 100% para mostrar "Finalizado"
+          this.updateProgressDetails(timerId, 100, 'download', 'Completed');
           
-          console.log('Update completed:', summary);
-          
-          // Show success toast
-          const successMessage = typeof summary === 'string' ? summary : `Update completed. ${summary.downloaded} files processed${summary.failed > 0 ? `, ${summary.failed} failed` : ''}`;
-          this.showToast(successMessage, 'success');
+          this.showToast('Update completed successfully ✓', 'success');
+          timerManager.completeTimer(timerId);
         },
-        // Error callback
         (error) => {
-          progressStatus.textContent = `Error: ${error.message}`;
+          // Error en descarga
+          logger.error('Download failed', { error });
+          this.showToast(`Update failed: ${error}`, 'error');
+          progressStatus.textContent = `Update failed: ${error}`;
+        }
+      );
+
+      // Guardar estado de actualización
+      await this.patchDownloader.saveUpdateState(serverFiles);
+
+      logger.info('Update process completed successfully');
+
+    } catch (error) {
+      logger.error('Update process failed', { error: error.message });
+      this.showToast(`Update failed: ${error.message}`, 'error');
+      progressStatus.textContent = `Update failed: ${error.message}`;
+    } finally {
+      this.isDownloading = false;
+      btnUpdate.disabled = false;
+      btnPlay.disabled = false;
+    }
+  }
+
+  async startRepair(progressFill, progressPercent, progressStatus, progressDetails, btnRepair) {
+    try {
+      this.isRepairing = true;
+      btnRepair.disabled = true;
+
+      const selectedFolder = localStorage.getItem('selectedFolder');
+      if (!selectedFolder) {
+        throw new Error('No folder selected');
+      }
+
+      logger.info('Starting repair process', { folder: selectedFolder });
+
+      // Resetear barra de progreso y mostrar progreso inmediatamente
+      this.resetProgressBar(progressFill, progressPercent, progressStatus, 'Starting repair...');
+      
+      // Asegurar que la barra esté visible y en 0%
+      progressFill.style.width = '0%';
+      progressPercent.textContent = '0%';
+      progressDetails.style.display = 'block';
+
+      // Actualizar la carpeta actual en el patchDownloader
+      this.patchDownloader.updateCurrentFolder(selectedFolder);
+
+      // Inicializar temporizador inmediatamente
+      const timerId = `repair_${Date.now()}`;
+      timerManager.startTimer(timerId, 'repair', 0, (timerInfo) => {
+        // Actualizar información detallada en tiempo real
+        this.updateProgressDetails(timerId, timerInfo.progress || 0, 'repair');
+      });
+
+      // Mostrar progreso inicial
+      progressStatus.textContent = 'Initializing repair...';
+      progressFill.style.width = '5%';
+      progressPercent.textContent = '5%';
+
+      // Ejecutar reparación
+      await repairService.startRepair(
+        selectedFolder,
+        (progressInfo) => {
+          // Actualizar progreso (5% a 95%)
+          const repairProgress = 5 + (progressInfo.progress || 0) * 0.9; // 90% del progreso
+          progressFill.style.width = `${repairProgress}%`;
+          progressPercent.textContent = `${Math.round(repairProgress)}%`;
+          progressStatus.textContent = `Repairing ${progressInfo.file || 'files'} (${progressInfo.reason || 'checking'})... ${Math.round(repairProgress)}%`;
           
-          btnUpdate.disabled = false;
-          this.isDownloading = false;
+          // Actualizar información detallada
+          this.updateProgressDetails(timerId, repairProgress, 'repair', progressInfo.file);
           
-          console.error('Update error:', error);
+          // Actualizar temporizador
+          timerManager.updateProgress(timerId, repairProgress);
+        },
+        (message) => {
+          logger.info('Repair completed', { message });
           
-          // Show error toast
-          this.showToast(`Update error: ${error.message}`, 'error');
+          // Asegurar que llegue al 100%
+          progressFill.style.width = '100%';
+          progressPercent.textContent = '100%';
+          progressStatus.textContent = message;
+          
+          // Actualizar información detallada con progreso 100% para mostrar "Finalizado"
+          this.updateProgressDetails(timerId, 100, 'repair', 'Completed');
+          
+          this.showToast(message, 'success');
+          timerManager.completeTimer(timerId);
+        },
+        (error) => {
+          logger.error('Repair failed', { error });
+          this.showToast(`Repair failed: ${error}`, 'error');
+          progressStatus.textContent = `Repair failed: ${error}`;
         }
       );
 
     } catch (error) {
-      progressStatus.textContent = `Error: ${error.message}`;
-      
-      btnUpdate.disabled = false;
-      this.isDownloading = false;
-      
-      console.error('Error in startUpdate:', error);
-      
-      // Show error toast
-      this.showToast(`Update error: ${error.message}`, 'error');
-    }
-  }
-
-  async startRepair(progressFill, progressPercent, progressStatus, btnRepair) {
-    try {
-      const selectedFolder = localStorage.getItem('selectedFolder');
-      if (!selectedFolder) {
-        this.showToast('You must select a folder before repairing.', 'error');
-        return;
-      }
-
-      this.isDownloading = true;
-      btnRepair.disabled = true;
-      
-      progressStatus.textContent = 'Starting repair...';
-      progressFill.style.width = '0%';
-      progressPercent.textContent = '0%';
-
-      // Simulate repair process
-      for (let i = 0; i <= 100; i += 10) {
-        if (!this.isDownloading) break;
-        
-        progressFill.style.width = `${i}%`;
-        progressPercent.textContent = `${i}%`;
-        progressStatus.textContent = `Repairing files... ${i}%`;
-        
-        await new Promise(resolve => setTimeout(resolve, 200));
-      }
-
-      if (this.isDownloading) {
-        progressFill.style.width = '100%';
-        progressPercent.textContent = '100%';
-        progressStatus.textContent = 'Repair completed ✓';
-        
-        btnRepair.disabled = false;
-        this.isDownloading = false;
-        
-        this.showToast('Files have been repaired successfully!', 'success');
-      }
-
-    } catch (error) {
-      progressStatus.textContent = `Repair error: ${error.message}`;
-      
+      logger.error('Repair process failed', { error: error.message });
+      this.showToast(`Repair failed: ${error.message}`, 'error');
+      progressStatus.textContent = `Repair failed: ${error.message}`;
+    } finally {
+      this.isRepairing = false;
       btnRepair.disabled = false;
-      this.isDownloading = false;
+    }
+  }
+
+  async extractFile(file, destFolder) {
+    try {
+      logger.info(`Extracting file: ${file.name} to ${destFolder}`);
       
-      console.error('Repair error:', error);
-    }
-  }
-
-
-
-  updateFileList(filename, progress, status) {
-    const fileList = document.getElementById('fileList');
-    if (!fileList) return;
-
-    fileList.style.display = 'block';
-
-    // Buscar o crear elemento para este archivo
-    let fileElement = fileList.querySelector(`[data-filename="${filename}"]`);
-    if (!fileElement) {
-      fileElement = document.createElement('div');
-      fileElement.setAttribute('data-filename', filename);
-      fileElement.className = 'file-item';
-      fileList.appendChild(fileElement);
-    }
-
-    // Actualizar contenido del elemento
-    const statusIcon = status === 'downloading' ? '📥' : status === 'completed' ? '✅' : status === 'error' ? '❌' : '⏳';
-    fileElement.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <span>${statusIcon} ${filename}</span>
-        <span>${progress}%</span>
-      </div>
-      ${status === 'downloading' ? `<div class="file-progress"><div class="file-progress-fill" style="width: ${progress}%;"></div></div>` : ''}
-    `;
-  }
-
-  calculateDownloadSpeed(downloaded, total) {
-    if (!downloaded || !total) return '';
-    
-    const downloadedMB = (downloaded / (1024 * 1024)).toFixed(1);
-    const totalMB = (total / (1024 * 1024)).toFixed(1);
-    
-    return `${downloadedMB}MB / ${totalMB}MB`;
-  }
-
-  showNotification(title, message, type = 'info') {
-    // Crear notificación visual
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    
-    notification.innerHTML = `
-      <strong>${title}</strong><br>
-      ${message}
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Remover después de 5 segundos
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
-      }
-    }, 5000);
-  }
-
-  // Verificar actualizaciones disponibles
-  async checkForUpdates() {
-    try {
-      await this.patchDownloader.initialize();
-      const files = await this.patchDownloader.getAvailableFiles();
-      console.log('Archivos disponibles:', files);
-      return files;
+      // Simular extracción con progreso
+      await new Promise((resolve) => {
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 20;
+          if (progress >= 100) {
+            clearInterval(interval);
+            resolve();
+          }
+        }, 100);
+      });
+      
+      logger.info(`File extracted successfully: ${file.name}`);
     } catch (error) {
-      console.error('Error verificando actualizaciones:', error);
-      return null;
+      logger.error(`Failed to extract file: ${file.name}`, { error: error.message });
+      throw error;
     }
   }
 
-  // Obtener información de un archivo específico
-  async getFileInfo(filename) {
-    try {
-      const info = await this.patchDownloader.getFileInfo(filename);
-      console.log('Información del archivo:', info);
-      return info;
-    } catch (error) {
-      console.error('Error obteniendo información del archivo:', error);
-      return null;
-    }
-  }
-
-  // Obtener estadísticas de descarga
-  getDownloadStats() {
-    return this.patchDownloader.getDownloadStats();
-  }
-
-  // Las barras de progreso ahora están siempre visibles en el HTML
-  // No necesitamos crear barras dinámicamente
-  createProgressBars(fileList) {
-    // Las barras ya están en el HTML, solo mostrar la lista de archivos si es necesario
-    if (fileList) {
-      fileList.style.display = 'block';
-    }
-  }
-
-  // Actualizar progreso de descarga
-  updateDownloadProgress(filename, percent) {
-    const downloadProgressFill = document.getElementById('downloadProgressFill');
-    const downloadProgressPercent = document.getElementById('downloadProgressPercent');
-    const downloadStatus = document.getElementById('downloadStatus');
-    
-    if (downloadProgressFill && downloadProgressPercent && downloadStatus) {
-      downloadProgressFill.style.width = `${percent}%`;
-      downloadProgressPercent.textContent = `${percent}%`;
-      downloadStatus.textContent = `Descargando: ${filename}`;
-    }
-  }
-
-  // Actualizar progreso de instalación (extracción)
-  updateInstallationProgress(filename, percent) {
-    const installationProgressFill = document.getElementById('installationProgressFill');
-    const installationProgressPercent = document.getElementById('installationProgressPercent');
-    const installationStatus = document.getElementById('installationStatus');
-    
-    if (installationProgressFill && installationProgressPercent && installationStatus) {
-      installationProgressFill.style.width = `${percent}%`;
-      installationProgressPercent.textContent = `${percent}%`;
-      installationStatus.textContent = `Instalando: ${filename}`;
-    }
-  }
-
-  // Ocultar lista de archivos (las barras siempre están visibles)
-  hideProgressBars() {
-    const fileList = document.getElementById('fileList');
-    if (fileList) {
-      fileList.style.display = 'none';
-    }
-    
-    // Resetear barras de progreso
-    this.resetProgressBars();
-  }
-
-  // Resetear barras de progreso
-  resetProgressBars() {
-    const downloadProgressFill = document.getElementById('downloadProgressFill');
-    const downloadProgressPercent = document.getElementById('downloadProgressPercent');
-    const downloadStatus = document.getElementById('downloadStatus');
-    const installationProgressFill = document.getElementById('installationProgressFill');
-    const installationProgressPercent = document.getElementById('installationProgressPercent');
-    const installationStatus = document.getElementById('installationStatus');
-    
-    if (downloadProgressFill && downloadProgressPercent && downloadStatus) {
-      downloadProgressFill.style.width = '0%';
-      downloadProgressPercent.textContent = '0%';
-      downloadStatus.textContent = 'Esperando...';
-    }
-    
-    if (installationProgressFill && installationProgressPercent && installationStatus) {
-      installationProgressFill.style.width = '0%';
-      installationProgressPercent.textContent = '0%';
-      installationStatus.textContent = 'Esperando...';
-    }
-  }
-
-  // Cargar rankings desde API
+  // Cargar rankings usando el rankingService
   async loadRankings() {
     try {
-      // Mock data por ahora - aquí se conectaría a la API real
-      const mockPvpRankings = [
-        { position: 1, name: 'DragonSlayer', score: 1250 },
-        { position: 2, name: 'ShadowKnight', score: 1180 },
-        { position: 3, name: 'BloodWarrior', score: 1120 },
-        { position: 4, name: 'DarkMage', score: 1050 },
-        { position: 5, name: 'IronGuard', score: 980 }
-      ];
-
-      const mockPkRankings = [
-        { position: 1, name: 'DeathBringer', score: 850 },
-        { position: 2, name: 'NightHunter', score: 780 },
-        { position: 3, name: 'ChaosLord', score: 720 },
-        { position: 4, name: 'VoidWalker', score: 680 },
-        { position: 5, name: 'SoulReaper', score: 620 }
-      ];
-
-      this.updateRankings('topPvpList', mockPvpRankings);
-      this.updateRankings('topPkList', mockPkRankings);
-
-      // En el futuro, aquí se haría la llamada real a la API:
-      // const pvpRankings = await fetch('/api/rankings/pvp').then(r => r.json());
-      // const pkRankings = await fetch('/api/rankings/pk').then(r => r.json());
-      
+      logger.info('Loading rankings using rankingService');
+      await this.rankingService.updateRankings();
+      logger.info('Rankings loaded successfully');
     } catch (error) {
-      console.error('Error cargando rankings:', error);
+      logger.error('Failed to load rankings', { error: error.message });
     }
   }
 
-  // Actualizar rankings en el DOM
-  updateRankings(listId, rankings) {
-    const listElement = document.getElementById(listId);
-    if (!listElement) return;
+  // Obtener estadísticas del sistema
+  getSystemStats() {
+    return {
+      isDownloading: this.isDownloading,
+      isRepairing: this.isRepairing,
+      isClientReady: this.isClientReady,
+      downloadStats: this.downloadStats,
+      repairStats: repairService.getRepairStats(),
+      timerStats: timerManager.getTimerStats(),
+      validationStats: fileValidator.getValidationStats(),
+      retryStats: retryManager.getRetryStats()
+    };
+  }
 
-    listElement.innerHTML = '';
+  // Actualizar información detallada del progreso
+  updateProgressDetails(timerId, progress, type = 'download', filename = null) {
+    const progressTime = document.getElementById('progressTime');
+    const progressSpeed = document.getElementById('progressSpeed');
+    const currentFile = document.getElementById('currentFile');
+    const progressDetails = document.getElementById('progressDetails');
     
-    rankings.forEach(ranking => {
-      const item = document.createElement('div');
-      item.className = 'ranking-item';
-      item.innerHTML = `
-        <span class="ranking-position">${ranking.position}</span>
-        <span class="ranking-name">${ranking.name}</span>
-        <span class="ranking-score">${ranking.score.toLocaleString()}</span>
-      `;
-      listElement.appendChild(item);
-    });
+    if (!progressTime || !progressSpeed || !currentFile) return;
+    
+    const timer = timerManager.activeTimers.get(timerId);
+    if (!timer) return;
+    
+    // Mostrar detalles solo cuando hay actividad
+    if (progressDetails) {
+      progressDetails.style.display = 'block';
+    }
+    
+    // Actualizar tiempo
+    const elapsed = Date.now() - timer.startTime;
+    const elapsedTime = timerManager.formatTime(elapsed);
+    progressTime.textContent = `Time: ${elapsedTime}`;
+    
+    // Actualizar velocidad según el tipo de operación y velocidad real
+    if (progress >= 100) {
+      // Operación completada - mostrar velocidad final o "Finalizado"
+      if (timer.finalAverageSpeed) {
+        const speed = timerManager.formatSpeed(timer.finalAverageSpeed);
+        progressSpeed.textContent = `Final Speed: ${speed}`;
+      } else {
+        progressSpeed.textContent = `Finalizado`;
+      }
+    } else {
+      // Operación en progreso - mostrar velocidad actual
+      const speed = timerManager.formatSpeed(timer.estimatedSpeed);
+      if (type === 'download') {
+        progressSpeed.textContent = `Download Speed: ${speed}`;
+      } else if (type === 'extraction') {
+        progressSpeed.textContent = `Install Speed: ${speed}`;
+      } else {
+        progressSpeed.textContent = `Speed: ${speed}`;
+      }
+    }
+    
+    // Actualizar archivo actual
+    if (filename) {
+      currentFile.textContent = `File: ${filename}`;
+    } else if (this.downloadStats && this.downloadStats.currentFile) {
+      currentFile.textContent = `File: ${this.downloadStats.currentFile}`;
+    } else if (timer.currentFile) {
+      currentFile.textContent = `File: ${timer.currentFile}`;
+    }
+  }
+
+  // Resetear información detallada del progreso
+  resetProgressDetails() {
+    const progressTime = document.getElementById('progressTime');
+    const progressSpeed = document.getElementById('progressSpeed');
+    const currentFile = document.getElementById('currentFile');
+    const progressDetails = document.getElementById('progressDetails');
+    
+    if (progressTime) progressTime.textContent = 'Time: --';
+    if (progressSpeed) progressSpeed.textContent = 'Speed: --';
+    if (currentFile) currentFile.textContent = 'File: --';
+    if (progressDetails) progressDetails.style.display = 'none';
   }
 }
 
-// Instanciar y configurar
-const gameLauncher = new GameLauncher();
-
-function setupDownloadButton() {
-  gameLauncher.setupDownloadButton();
+// Función de inicialización global
+async function initializeGameLauncher() {
+  try {
+    const gameLauncher = new GameLauncher();
+    await gameLauncher.initialize();
+    gameLauncher.setupDownloadButton();
+    
+    // Cargar rankings
+    await gameLauncher.loadRankings();
+    
+    // Configurar actualización automática de rankings
+    setInterval(() => {
+      gameLauncher.loadRankings();
+    }, 5 * 60 * 1000); // Cada 5 minutos
+    
+    logger.info('GameLauncher setup completed');
+  } catch (error) {
+    logger.error('Failed to initialize GameLauncher', { error: error.message });
+  }
 }
 
-export { setupDownloadButton, gameLauncher };
+// Inicializar cuando el DOM esté listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeGameLauncher);
+} else {
+  initializeGameLauncher();
+}

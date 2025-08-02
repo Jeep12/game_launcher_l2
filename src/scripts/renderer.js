@@ -1,60 +1,68 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import '../assets/styles/fonts.css';
-import '../assets/styles/style.css';
+// renderer.js - Punto de entrada del renderer actualizado
 import './externalLinks.js';
+import { initFolderSelector } from './folderSelector.js';
+import './gameLauncher.js';
 
-import { initFolderSelector } from './folderSelector';
-import { setupDownloadButton, gameLauncher } from './gameLauncher.js';
-import RankingService from './rankingService.js';
+// Importar sistemas de logging y validación
+import { logger } from './logger.js';
+import { fileValidator } from './fileValidator.js';
+import { retryManager } from './retryManager.js';
+import { repairService } from './repairService.js';
+import { timerManager } from './timerManager.js';
 
-// Funcionalidad para la barra de título personalizada
-function initTitleBarControls() {
-  // Función para inicializar cuando window.electron esté disponible
-  function initWhenElectronReady() {
-    if (window.electron) {
-      // Botón minimizar
-      const minimizeBtn = document.getElementById('minimizeBtn');
-      if (minimizeBtn) {
-        minimizeBtn.addEventListener('click', () => {
-          window.electron.minimizeWindow();
-        });
-      }
-      
-      // Botón cerrar
-      const closeBtn = document.getElementById('closeBtn');
-      if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-          window.electron.closeWindow();
-        });
-      }
-    } else {
-      // Si window.electron no está disponible, reintentar en 100ms
-      setTimeout(initWhenElectronReady, 100);
-    }
+// Inicializar sistemas cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    logger.info('Renderer initialized');
+    
+    // Inicializar sistemas básicos
+    await logger.initialize();
+    
+    // Inicializar folder selector
+    initFolderSelector();
+    
+    // Configurar botones de la ventana
+    setupWindowControls();
+    
+    // Configurar limpieza automática
+    setInterval(() => {
+      timerManager.cleanup();
+      logger.clearOldLogs();
+    }, 5 * 60 * 1000); // Cada 5 minutos
+    
+    logger.info('Renderer setup completed');
+  } catch (error) {
+    console.error('Failed to initialize renderer:', error);
   }
+});
 
-  // Iniciar cuando esté listo
-  initWhenElectronReady();
+// Configurar controles de ventana
+function setupWindowControls() {
+  const minimizeBtn = document.getElementById('minimizeBtn');
+  const closeBtn = document.getElementById('closeBtn');
+  
+  if (minimizeBtn) {
+    minimizeBtn.addEventListener('click', () => {
+      if (window.electron && window.electron.minimizeWindow) {
+        window.electron.minimizeWindow();
+      }
+    });
+  }
+  
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      if (window.electron && window.electron.closeWindow) {
+        window.electron.closeWindow();
+      }
+    });
+  }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  initFolderSelector();
-  setupDownloadButton(); // <-- conectamos el botón acá
-  
-  // Inicializar controles de la barra de título
-  initTitleBarControls();
-  
-  // Exponer gameLauncher globalmente para que folderSelector pueda acceder
-  window.gameLauncher = gameLauncher;
-  
-  // Inicializar y cargar rankings
-  const rankingService = new RankingService();
-  rankingService.updateRankings();
-  
-  // Actualizar rankings cada 5 minutos
-  setInterval(() => {
-    rankingService.updateRankings();
-  }, 5 * 60 * 1000);
-});
+// Exportar para uso global
+window.gameLauncherSystems = {
+  logger,
+  fileValidator,
+  retryManager,
+  repairService,
+  timerManager
+};

@@ -6,10 +6,13 @@ const fs = require('fs');
 
 module.exports = {
   mode: 'development',
-  entry: './src/scripts/renderer.js',
+  entry: {
+    main: './src/scripts/renderer.js',
+    styles: './src/styles/main.css'
+  },
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: 'renderer.bundle.js',
+    filename: '[name].bundle.js',
     clean: true
   },
   module: {
@@ -37,7 +40,8 @@ module.exports = {
         { from: 'src/views', to: 'views' },
         { from: 'src/preload.js', to: 'preload.js' },
         { from: 'index.html', to: 'index.html' },
-        { from: 'splash.html', to: 'splash.html' }
+        { from: 'splash.html', to: 'splash.html' },
+        { from: 'src/assets/images/icons/terra_icon.ico', to: 'assets/images/icons/terra_icon.ico' }
       ]
     }),
     new MiniCssExtractPlugin({
